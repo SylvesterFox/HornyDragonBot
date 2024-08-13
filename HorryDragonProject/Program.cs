@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Interactions;
+using Discord.WebSocket;
+using HorryDragonProject.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,9 +20,13 @@ namespace HorryDragonProject {
 
 
             var builder = new HostApplicationBuilder();
+            builder.Services.AddSingleton<LogHandler>();
+            builder.Services.AddSingleton(X => new InteractionService(X.GetRequiredService<DiscordSocketClient>()));
+            builder.Services.AddSingleton<InteractionHandler>();
             builder.Services.AddHostedService<BaseBot>();
             builder.Services.AddSingleton<DiscordSocketClient>();
-
+            
+            
             builder.Services.AddLogging(s => s.AddConsole()
             #if DEBUG
             .SetMinimumLevel(LogLevel.Trace)
