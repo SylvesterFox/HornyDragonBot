@@ -15,7 +15,7 @@ namespace HorryDragonProject.api.e621{
         public void Run() {
             _request = (HttpWebRequest)WebRequest.Create(_address);
             _request.Method = "Get";
-
+            _request.UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
            try
            {
                 HttpWebResponse response = (HttpWebResponse)_request.GetResponse();
