@@ -15,11 +15,10 @@ public class E621Module : BaseModule
 
     [SlashCommand("testresponse", "get-test json response")]
     public async Task TestResponseCmd() {
-        
-        string url = $"https://e621.net/posts.json?login={_botConfig.USER_E621}&api_key={_botConfig.TOKEN_E621}";
-        var e621Api = new E621api(url);
-        e621Api.Run();
-        await RespondAsync("Test api");
+        await DeferAsync();
+        var e621Api = new E621api(_botConfig.TOKEN_E621, _botConfig.USER_E621);
+        await e621Api.RunGetPost("dragon+feral");
+        await FollowupAsync("Test api");
         _logger.LogInformation(e621Api.Response);
     }
 }
