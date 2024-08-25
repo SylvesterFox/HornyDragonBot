@@ -1,51 +1,96 @@
-using System.Net;
+using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace HorryDragonProject.api.e621{
     public class E621api
     {
-        private HttpWebRequest _request;
+
+        public readonly ILogger _logger;
+
         private string _address;
-        public int limit { get; set; } = 1;
+
+        private string _user;
+
+        private string _token;
+        private int _limit { get; set; } = 1;
         public string reating { get; set; } = "e";
-        public string Response { get; set; }
-        // private HttpClientHandler _clientHandler = new HttpClientHandler();
-        public E621api(string tokenApi, string user)
+        public List<Post> Response { get; set; }
+
+        public E621api(string tokenApi, string user, ILoggerFactory log)
         {
-            _address = $"https://e621.net/posts.json?login={user}&api_key={tokenApi}&limit={limit}";
-            // _clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            _token = tokenApi;
+            _user = user;
+            _address = $"https://e621.net/posts.json";
+            _logger = log.CreateLogger("E621api");
         }
 
-        public async Task RunGetPost(string tags) {
-            var uri = _address + $"&tags={tags}+rating:{reating}";
-           try
-           {
-               using (HttpClient client = new HttpClient())
-               {
-                client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+        private async Task<string> _RequsetApi(string uri, string tag)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+                    /*client.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));*/
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
 
-                HttpResponseMessage response = await client.GetAsync(uri);
+                    var uriString = uri + $"&limit={_limit}$tags={tag}";
 
-                response.EnsureSuccessStatusCode();
+                    
+                    HttpResponseMessage response = await client.GetAsync(uriString);
 
-                Response = await response.Content.ReadAsStringAsync();
+                    response.EnsureSuccessStatusCode();
 
-                var deserializedResponse = JsonSerializer.Deserialize<E621Post>(Response);
+                    var _response = await response.Content.ReadAsStringAsync();
+                    return _response;
 
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new HttpRequestException(HttpRequestError.ConnectionError);
+            }
+        }
+
+        public async Task<Post?> GetPost(string tags) {
+
+            var tag = $"{tags}+rating:{reating}";
+            var _response = await _RequsetApi(_address, tag);
+            var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
+
+            if (deserializedResponse != null)
+            {
                 foreach (var post in deserializedResponse.Posts)
                 {
-                    Console.WriteLine($"Post ID: {post.Id}");
-                    Console.WriteLine($"Created At: {post.CreatedAt}");
-                    Console.WriteLine($"File URL: {post.File.Url}");
+                    return post;
                 }
+            }
 
-               }
-           }
-           catch (Exception ex)
-           {
-                Console.WriteLine(ex);
-           }
+            throw new NullReferenceException($"Response is null!");
         }
+
+        public async Task GetAllResponse(string tags, int linit = 3)
+        {
+            _limit = linit;
+            if (_limit > 320)
+            {
+                _limit = 320;
+            }
+
+            var tag = $"{tags}+rating:{reating}";
+            var _response = await _RequsetApi(_address, tag);
+            var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
+
+            if(deserializedResponse != null)
+            {
+                Response = deserializedResponse.Posts;
+            }
+            
+        }
+
+
     }
 
 }
