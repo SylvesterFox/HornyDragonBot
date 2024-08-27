@@ -35,7 +35,11 @@ public class E621Module : BaseModule
         await _api.GetAllResponse(tag, 3);
 
 
-        await FollowupAsync(_api.Response[2].File.Url);
+        foreach (var post in _api.Response)
+        {
+            await FollowupAsync(post.File.Url);
+        }
+
         _logger.LogInformation($"This id post: {_api.Response[2].Id} Length: {_api.Response.Count}");
     }
 }
