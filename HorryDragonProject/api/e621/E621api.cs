@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using RestSharp;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -6,7 +7,7 @@ namespace HorryDragonProject.api.e621{
     public class E621api
     {
 
-        public readonly ILogger _logger;
+        public readonly ILogger _logger;    
 
         private string _address;
 
@@ -29,22 +30,24 @@ namespace HorryDragonProject.api.e621{
         {
             try
             {
-                using (HttpClient client = new HttpClient())
+
+                var requrst = new RestRequest(uri, Method.Get);
+                requrst.AddParameter("tags", $"rating:{reating}");
+                requrst.AddParameter("tags", tag);
+                requrst.AddParameter("limit", _limit);
+
+                requrst.AddHeader("User-Agent", "HorryDragonProject/1.0 (by Dragofox)");
+                requrst.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
+
+                var restApi = new RestClient();
+                var response = await restApi.ExecuteAsync(requrst);
+                if ((int)response.StatusCode != 200)
                 {
-                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
-                    /*client.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));*/
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
-
-                    var uriString = uri + $"&limit={_limit}$tags={tag}";
-
-                    
-                    HttpResponseMessage response = await client.GetAsync(uriString);
-
-                    response.EnsureSuccessStatusCode();
-
-                    var _response = await response.Content.ReadAsStringAsync();
-                    return _response;
-
+                    _logger.LogTrace("Error: " + response.Content);
+                    return null;
+                } else
+                {
+                    return response.Content;
                 }
             }
             catch (Exception ex)
@@ -79,8 +82,7 @@ namespace HorryDragonProject.api.e621{
                 _limit = 320;
             }
 
-            var tag = $"{tags}+rating:{reating}";
-            var _response = await _RequsetApi(_address, tag);
+            var _response = await _RequsetApi(_address, tags);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
             if(deserializedResponse != null)

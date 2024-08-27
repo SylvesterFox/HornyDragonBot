@@ -32,10 +32,10 @@ public class E621Module : BaseModule
                     return;
                 }*/
 
-        await _api.GetAllResponse(tag, 2);
+        await _api.GetAllResponse(tag, 3);
 
 
-        await FollowupAsync(_api.Response[0].File.Url);
-        _logger.LogInformation($"This id post: {_api.Response[0].Id} Length: {_api.Response.Count}");
+        await FollowupAsync(_api.Response[2].File.Url);
+        _logger.LogInformation($"This id post: {_api.Response[2].Id} Length: {_api.Response.Count}");
     }
 }
