@@ -128,7 +128,34 @@ public class Sample
     public required string Url { get; set; }
 
     [JsonPropertyName("alternates")]
-    public required Dictionary<string, string> Alternates { get; set; }
+    public Alternates? Alternates { get; set; }
+}
+
+public class Alternates
+{
+    [JsonPropertyName("720p")]
+    public VideoResolution? Video720p { get; set; }
+
+    [JsonPropertyName("480p")]
+    public VideoResolution? Video480p { get; set; }
+
+    [JsonPropertyName("original")]
+    public VideoResolution? Original { get; set; }
+}
+
+public class VideoResolution
+{
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
+    [JsonPropertyName("height")]
+    public int? Height { get; set; }
+
+    [JsonPropertyName("width")]
+    public int? Width { get; set; }
+
+    [JsonPropertyName("urls")]
+    public required List<string>? Urls { get; set; }
 }
 
 public class Score

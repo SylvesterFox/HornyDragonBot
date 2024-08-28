@@ -16,6 +16,7 @@ namespace HorryDragonProject.api.e621{
         private string _token;
         private int _limit { get; set; } = 1;
         public string reating { get; set; } = "e";
+        private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
         public E621api(string tokenApi, string user, ILoggerFactory log)
@@ -32,7 +33,13 @@ namespace HorryDragonProject.api.e621{
             {
 
                 var requrst = new RestRequest(uri, Method.Get);
+                // Вот так оно не работает
                 requrst.AddParameter("tags", $"rating:{reating}");
+                if (!string.IsNullOrEmpty(types)){
+                    requrst.AddParameter("tags", $"type:{types}");
+                    _logger.LogDebug("test: " + types);
+                }
+                // Вот это кусок кода
                 requrst.AddParameter("tags", tag);
                 requrst.AddParameter("limit", _limit);
 
@@ -74,9 +81,15 @@ namespace HorryDragonProject.api.e621{
             throw new NullReferenceException($"Response is null!");
         }
 
-        public async Task GetAllResponse(string tags, int linit = 3)
+        public async Task GetAllResponse(string tags, int linit = 3, string type = "")
         {
             _limit = linit;
+
+            if (string.Empty != type){
+                types = type;
+                _logger.LogDebug("" + type);
+            }
+
             if (_limit > 320)
             {
                 _limit = 320;

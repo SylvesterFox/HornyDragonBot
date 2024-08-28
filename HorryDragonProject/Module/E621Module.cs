@@ -19,7 +19,7 @@ public class E621Module : BaseModule
 
 
     [SlashCommand("testresponse", "get-test json response")]
-    public async Task TestResponseCmd(string tag) {
+    public async Task TestResponseCmd(string tag, string type = "") {
         await DeferAsync();
 
 
@@ -32,7 +32,7 @@ public class E621Module : BaseModule
                     return;
                 }*/
 
-        await _api.GetAllResponse(tag, 3);
+        await _api.GetAllResponse(tag, 3, type);
 
 
         foreach (var post in _api.Response)
