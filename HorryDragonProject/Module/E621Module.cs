@@ -1,5 +1,7 @@
+using Discord;
 using Discord.Interactions;
 using HorryDragonProject.api.e621;
+using HorryDragonProject.Service;
 using HorryDragonProject.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +11,9 @@ public class E621Module : BaseModule
 {
     private readonly BotConfig? _botConfig;
     private readonly E621api _api;
+    public ServicePaged pagination { private get;  set; }
+
+
     public E621Module(ILoggerFactory log) : base(log)
     {
         _botConfig = BotSettingInit.Instance.LoadedConfig;
@@ -16,6 +21,18 @@ public class E621Module : BaseModule
 
     }
 
+
+    public static List<string> GetPageImage(E621api api)
+    {
+        List<string> images = new List<string>();
+        
+        foreach (var post in api.Response)
+        {
+            images.Add(post.File.Url);
+        }
+
+        return images;
+    }
 
 
     [SlashCommand("testresponse", "get-test json response")]
@@ -32,14 +49,21 @@ public class E621Module : BaseModule
                     return;
                 }*/
 
-        await _api.GetAllResponse(tag, 3, type);
+        await _api.GetAllResponse(tag, 10, type);
+        List<EmbedBuilder> builders = GetPageImage(_api).Select(str => new EmbedBuilder().WithImageUrl(str.ToString())).ToList();
+        await pagination.SendImageMessage(Context, new MessageImagePaged(builders, "E621 view!", Color.Blue, Context.User, new AppearanceOptions()
+        {
+            Timeout = TimeSpan.FromMinutes(20),
+            Style = DisplayStyle.Full,
+        }), folloup: true);
 
-
-        foreach (var post in _api.Response)
+        /*foreach (var post in _api.Response)
         {
             await FollowupAsync(post.File.Url);
-        }
+        }*/
 
-        _logger.LogInformation($"This id post: {_api.Response[2].Id} Length: {_api.Response.Count}");
+        
+
+        _logger.LogInformation($"Length post: {_api.Response.Count}");
     }
 }
