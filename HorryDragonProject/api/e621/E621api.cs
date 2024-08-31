@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using RestSharp;
-using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace HorryDragonProject.api.e621{
@@ -8,11 +7,8 @@ namespace HorryDragonProject.api.e621{
     {
 
         public readonly ILogger _logger;    
-
         private string _address;
-
         private string _user;
-
         private string _token;
         private int _limit { get; set; } = 1;
         public string reating { get; set; } = "e";
@@ -33,13 +29,7 @@ namespace HorryDragonProject.api.e621{
             {
 
                 var requrst = new RestRequest(uri, Method.Get);
-                // Вот так оно не работает
-                requrst.AddParameter("tags", $"rating:{reating}");
-                if (!string.IsNullOrEmpty(types)){
-                    requrst.AddParameter("tags", $"type:{types}");
-                    _logger.LogDebug("test: " + types);
-                }
-                // Вот это кусок кода
+
                 requrst.AddParameter("tags", tag);
                 requrst.AddParameter("limit", _limit);
 
