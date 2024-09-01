@@ -11,6 +11,13 @@ namespace HorryDragonProject.Module {
         {
             _logger = log.CreateLogger("CommandModule");
         }
+
+
+        public static Task<string> SendVideoTemplate(string videoUrl)
+        {
+            string message = $"> ## E621 video view message\n> [Link]({videoUrl})";
+            return Task.FromResult(message);       
+        }
     }
 
 }

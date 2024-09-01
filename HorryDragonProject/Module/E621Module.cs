@@ -7,11 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace HorryDragonProject.Module;
 
+[Group("e621", "e621 commands")]
 public class E621Module : BaseModule
 {
     private readonly BotConfig? _botConfig;
     private readonly E621api _api;
-    public ServicePaged pagination { private get;  set; }
+    public ServicePaged pagination { private get; set; }
 
 
     public E621Module(ILoggerFactory log) : base(log)
@@ -21,48 +22,26 @@ public class E621Module : BaseModule
 
     }
 
+ 
 
-    public static List<string> GetPageImage(E621api api)
-    {
-        List<string> images = new List<string>();
-        
-        foreach (var post in api.Response)
-        {
-            images.Add(post.File.Url);
-        }
-
-        return images;
-    }
-
-
-    [SlashCommand("testresponse", "get-test json response")]
-    public async Task TestResponseCmd(string tag, string type = "") {
+    [SlashCommand("search", "Post viewer")]
+    public async Task SearchCmd(string tag, string type = "") {
         await DeferAsync();
 
+        await _api.GetAllResponse(tag, type: type);
+        List<EmbedBuilder> builders = _api.Response.Select(str => new EmbedBuilder()
+        {
+            ImageUrl = str.File.Url,
+            Description = $"## Search tags:```{tag}```\n## Tags: ```{string.Join(", ", str.Tags.General.Take(25))}```\n\n[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})"
+            
+        }).ToList();
 
-        /*        var _response = await _api.GetPost(tag);
-
-
-                if (_response == null)
-                {
-                    await FollowupAsync("`The answer came back empty, apparently that tag does not exist`");
-                    return;
-                }*/
-
-        await _api.GetAllResponse(tag, 10, type);
-        List<EmbedBuilder> builders = GetPageImage(_api).Select(str => new EmbedBuilder().WithImageUrl(str.ToString())).ToList();
         await pagination.SendImageMessage(Context, new MessageImagePaged(builders, "E621 view!", Color.Blue, Context.User, new AppearanceOptions()
         {
             Timeout = TimeSpan.FromMinutes(20),
             Style = DisplayStyle.Full,
         }), folloup: true);
 
-        /*foreach (var post in _api.Response)
-        {
-            await FollowupAsync(post.File.Url);
-        }*/
-
-        
 
         _logger.LogInformation($"Length post: {_api.Response.Count}");
     }

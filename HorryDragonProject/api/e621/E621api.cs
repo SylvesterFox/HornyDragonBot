@@ -71,7 +71,7 @@ namespace HorryDragonProject.api.e621{
             throw new NullReferenceException($"Response is null!");
         }
 
-        public async Task GetAllResponse(string tags, int linit = 3, string type = "")
+        public async Task GetAllResponse(string tags, int linit = 320, string type = "")
         {
             _limit = linit;
 
