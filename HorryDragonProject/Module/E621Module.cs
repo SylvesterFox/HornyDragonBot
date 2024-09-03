@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using HorryDragonProject.api.e621;
+using HorryDragonProject.Custom;
 using HorryDragonProject.Service;
 using HorryDragonProject.Settings;
 using Microsoft.Extensions.Logging;
@@ -29,14 +30,9 @@ public class E621Module : BaseModule
         await DeferAsync();
 
         await _api.GetAllResponse(tag, type: type);
-        List<EmbedBuilder> builders = _api.Response.Select(str => new EmbedBuilder()
-        {
-            ImageUrl = str.File.Url,
-            Description = $"## Search tags:```{tag}```\n## Tags: ```{string.Join(", ", str.Tags.General.Take(25))}```\n\n[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})"
-            
-        }).ToList();
+        List<EmbedBuilder> builders = _api.Response.Select(str => TemplateEmbeds.PostEmbedTemplate(str, tag)).ToList();
 
-        await pagination.SendImageMessage(Context, new MessageImagePaged(builders, "E621 view!", Color.Blue, Context.User, new AppearanceOptions()
+        await pagination.SendImageMessage(Context, new MessageImagePaged(builders, _api.Response, Context.User, new AppearanceOptions()
         {
             Timeout = TimeSpan.FromMinutes(20),
             Style = DisplayStyle.Full,

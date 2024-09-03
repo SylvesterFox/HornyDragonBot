@@ -38,7 +38,7 @@ namespace HorryDragonProject {
                 await Task.CompletedTask;
                 await _sCommand.RegisterCommandsGloballyAsync(true);
                 Console.WriteLine("Starting rawr bot..");
-                Console.WriteLine($"Ver: {Assembly.GetEntryAssembly().GetName().Version} ");
+                Console.WriteLine($"Ver: {Assembly.GetEntryAssembly()?.GetName().Version} ");
             };
 
             

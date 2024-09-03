@@ -2,6 +2,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using HorryDragonProject.api.e621;
 using Color = Discord.Color;
 
 namespace HorryDragonProject.Service
@@ -18,30 +19,29 @@ namespace HorryDragonProject.Service
     }
 
     public class MessageImagePaged {
-        private string Title { get; }
-        private Color EmbedColor { get; }
+/*        private string Title { get; }
+        private Color EmbedColor { get; }*/
         private IReadOnlyCollection<Embed> Pages { get; }
         internal IUser User { get; }
         internal AppearanceOptions Options { get; }
         internal int CurrentPage { get; set; }
-
+        internal List<Post> contextPost { get; set; }
         internal int Count => Pages.Count;
 
-        public MessageImagePaged(IEnumerable<EmbedBuilder> builders, String? title = null, Color? embedColor = null, IUser user = null,  AppearanceOptions options = null)
+        public MessageImagePaged(IEnumerable<EmbedBuilder> builders, List<Post> post, IUser user = null,  AppearanceOptions options = null)
         {
             List<Embed> embeds = new List<Embed>();
 
             int i = 1;
+            int n = 0;
             foreach (EmbedBuilder builder in builders)
             {
-                builder.Color ??= embedColor;
-                builder.Title ??= title;
-                builder.Footer ??= new EmbedFooterBuilder().WithText($"Page: {i++}/{builders.Count()}");
+
+                builder.Footer ??= new EmbedFooterBuilder().WithText($"Page: {i++}/{builders.Count()} -- Post id:{post[n++].Id}");
                 embeds.Add(builder.Build());
             }
             Pages = embeds;
-            Title = title ?? string.Empty;
-            EmbedColor = embedColor ?? Color.Default;
+            contextPost = post;
             User = user;
             Options = options;
             CurrentPage = 1;

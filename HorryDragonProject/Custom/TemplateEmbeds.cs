@@ -1,4 +1,5 @@
 using Discord;
+using HorryDragonProject.api.e621;
 
 namespace HorryDragonProject.Custom {
     public class TemplateEmbeds
@@ -49,6 +50,23 @@ namespace HorryDragonProject.Custom {
             return embed.Build();
         }
 
+
+        public static EmbedBuilder PostEmbedTemplate(Post str, string tag)
+        {
+
+            string description = $"## Search tags:```{tag}```\n";
+            description += $"## Tags: ```{string.Join(", ", str.Tags.General.Take(25))}```\n\n";
+            description += $"[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})";
+
+
+            EmbedBuilder postEmbed = new EmbedBuilder()
+            {
+                Description = description,
+                ImageUrl = str.File.Url  
+            };
+
+            return postEmbed;
+        }
 
         
     }
