@@ -1,5 +1,6 @@
 using Discord;
 using HorryDragonProject.api.e621;
+using HorryDragonProject.Service;
 
 namespace HorryDragonProject.Custom {
     public class TemplateEmbeds
@@ -9,9 +10,12 @@ namespace HorryDragonProject.Custom {
         public static Color successColor { get; } = Color.Green;
         private static Color _e621Color { get; } = Color.Blue;
 
+        public static string footerText { get; } = "Dragofox property :b";
+        public static string footerIco { get; } = "https://media.discordapp.net/attachments/896091932000927745/1250845431823335537/dragofox_new_pfp.png?ex=66c6bad6&is=66c56956&hm=2e27c45b3d14fdd21cc8cf9b899e9dc4f9d95b7e5ee8df72a4e56380243a3b1b&=&format=webp&quality=lossless&width=575&height=450";
+
         private static EmbedFooterBuilder _creatorName = new EmbedFooterBuilder() {
-          Text = "Dragofox property :b",
-          IconUrl = "https://media.discordapp.net/attachments/896091932000927745/1250845431823335537/dragofox_new_pfp.png?ex=66c6bad6&is=66c56956&hm=2e27c45b3d14fdd21cc8cf9b899e9dc4f9d95b7e5ee8df72a4e56380243a3b1b&=&format=webp&quality=lossless&width=575&height=450"
+          Text = footerText,
+          IconUrl = footerIco
         };
         
         public static Embed embedError(string msg, Color? color = null) {
@@ -69,7 +73,46 @@ namespace HorryDragonProject.Custom {
             return postEmbed;
         }
 
-        
+    }
+
+    public class MessageImagePaged {
+
+        private IReadOnlyCollection<Embed> Pages { get; }
+        internal IUser User { get; }
+        internal AppearanceOptions Options { get; }
+        internal int CurrentPage { get; set; }
+        internal List<Post> contextPost { get; set; }
+        internal int Count => Pages.Count;
+
+        public MessageImagePaged(IEnumerable<EmbedBuilder> builders, List<Post> post, IUser user = null,  AppearanceOptions options = null)
+        {
+            List<Embed> embeds = new List<Embed>();
+
+            int i = 1;
+            int n = 0;
+            foreach (EmbedBuilder builder in builders)
+            {
+
+                builder.Footer ??= new EmbedFooterBuilder().WithText($"Page: {i++}/{builders.Count()} -- Post id:{post[n++].Id}");
+                embeds.Add(builder.Build());
+            }
+            Pages = embeds;
+            contextPost = post;
+            User = user;
+            Options = options;
+            CurrentPage = 1;
+        }
+
+        internal Embed GetEmbed()
+        {
+            var page = Pages.ElementAtOrDefault(CurrentPage - 1);
+            if (page != null) {
+                return page;
+            }
+
+            throw new ArgumentNullException();
+        }
+
     }
 }
 

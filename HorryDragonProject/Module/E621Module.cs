@@ -43,7 +43,7 @@ public class E621Module : BaseModule
 
             _logger.LogInformation($"Length post: {_api.Response.Count}");
         } else {
-            List<string> messagePage = _api.Response.Select(str => SendVideoTemplate(str.File.Url)).ToList();
+            List<string> messagePage = _api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
             await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, _api.Response, Context.User, new AppearanceOptions() {
                 Timeout = TimeSpan.FromMinutes(20),
                 Style = DisplayStyle.Full
