@@ -11,6 +11,8 @@ namespace HorryDragonProject.api.e621{
         private string _user;
         private string _token;
         private int _limit { get; set; } = 1;
+
+        private string _requrstPage { get; set; } = "1";
         public string reating { get; set; } = "e";
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
@@ -30,8 +32,9 @@ namespace HorryDragonProject.api.e621{
 
                 var requrst = new RestRequest(uri, Method.Get);
 
-                requrst.AddParameter("tags", tag);
+                requrst.AddParameter("tags", tag + $" {types}");
                 requrst.AddParameter("limit", _limit);
+                requrst.AddParameter("page", _requrstPage);
 
                 requrst.AddHeader("User-Agent", "HorryDragonProject/1.0 (by Dragofox)");
                 requrst.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
@@ -71,15 +74,16 @@ namespace HorryDragonProject.api.e621{
             throw new NullReferenceException($"Response is null!");
         }
 
-        public async Task GetAllResponse(string tags, int linit = 320, string type = "")
+        public async Task GetAllResponse(string tags, int linit = 320, string? type = "", string? page = null)
         {
             _limit = linit;
 
-            if (string.Empty != type){
+            if (type != "type:webm") {
+                types = type + " -type:webm";
+            } else {
                 types = type;
-                _logger.LogDebug("" + type);
             }
-
+            
             if (_limit > 320)
             {
                 _limit = 320;

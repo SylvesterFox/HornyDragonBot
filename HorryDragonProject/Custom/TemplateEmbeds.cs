@@ -62,7 +62,8 @@ namespace HorryDragonProject.Custom {
             EmbedBuilder postEmbed = new EmbedBuilder()
             {
                 Description = description,
-                ImageUrl = str.File.Url  
+                ImageUrl = str.File.Url,
+                Color = _e621Color 
             };
 
             return postEmbed;

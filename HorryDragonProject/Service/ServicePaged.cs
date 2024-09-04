@@ -3,7 +3,6 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using HorryDragonProject.api.e621;
-using Color = Discord.Color;
 
 namespace HorryDragonProject.Service
 {
@@ -15,7 +14,8 @@ namespace HorryDragonProject.Service
     public enum DisplayStyle {
         Full,
         Minimal,
-        Selector
+        Selector,
+        ViewerE
     }
 
     public class MessageImagePaged {
@@ -59,6 +59,44 @@ namespace HorryDragonProject.Service
 
     }
 
+    public class MessageVideoPaged {
+
+        private IReadOnlyCollection<string> Pages { get; }
+        internal IUser User { get; }
+        internal AppearanceOptions Options { get; }
+        internal int CurrentPage { get; set; }
+        internal List<Post> contextPost { get; set; }
+        internal int Count => Pages.Count;
+
+
+        public MessageVideoPaged(IEnumerable<string> messagesVideo, List<Post> post, IUser user = null,  AppearanceOptions options = null)
+        {
+            List<string> msgPage = new List<string>();
+
+            int i = 1;
+            int n = 0;
+            foreach (var message in messagesVideo) {
+                string msg = message + $"```\nPage: {i++}/{messagesVideo.Count()} -- Post id:{post[n++].Id}```";
+                msgPage.Add(msg);
+            }
+            Pages = msgPage;
+            contextPost = post;
+            User = user;
+            Options = options;
+            CurrentPage = 1;
+        }
+
+         internal string GetMessage()
+        {
+            var page = Pages.ElementAtOrDefault(CurrentPage - 1);
+            if (page != null) {
+                return page;
+            }
+
+            throw new ArgumentNullException();
+        }
+    }
+
     public class AppearanceOptions
     {
         public TimeSpan Timeout { get; set; } = TimeSpan.Zero;
@@ -71,14 +109,16 @@ namespace HorryDragonProject.Service
     public class ServicePaged
     {
         private readonly Dictionary<ulong, MessageImagePaged> imageMessage;
+        private readonly Dictionary<ulong, MessageVideoPaged> videoMessage;
 
         public ServicePaged(DiscordSocketClient client)
         {
             imageMessage = new Dictionary<ulong, MessageImagePaged>();
-            client.ButtonExecuted += ButtonHandlerEmbedImage;
+            videoMessage = new Dictionary<ulong, MessageVideoPaged>();
+            client.ButtonExecuted += ButtonHandlerImage;
         }
 
-        public async Task<IUserMessage> SendImageMessage(SocketInteractionContext ctx, MessageImagePaged paged, bool folloup = false)
+        public async Task<IUserMessage> SendMessage(SocketInteractionContext ctx, MessageImagePaged paged,  bool folloup = false)
         {
             IUserMessage message;
 
@@ -106,6 +146,16 @@ namespace HorryDragonProject.Service
                         builder.WithButton("<-", "back", ButtonStyle.Primary);
                         builder.WithButton("Select", "select", ButtonStyle.Success);
                         builder.WithButton("->", "next", ButtonStyle.Primary);
+                        break;
+
+                    case DisplayStyle.ViewerE:
+                        builder.WithButton("<--", "first", ButtonStyle.Secondary);
+                        builder.WithButton("<-", "back", ButtonStyle.Primary);
+                        builder.WithButton("X", "stop", ButtonStyle.Danger);
+                        builder.WithButton("->", "next", ButtonStyle.Primary);
+                        builder.WithButton("-->", "last", ButtonStyle.Secondary);
+                        builder.WithButton("Prev page", "p", ButtonStyle.Secondary, row:1);
+                        builder.WithButton("More", "n", ButtonStyle.Secondary, row: 1);                      
                         break;
                 }
 
@@ -168,14 +218,119 @@ namespace HorryDragonProject.Service
 
         }
 
-        public async Task ButtonHandlerEmbedImage(SocketMessageComponent component)
+        public async Task<IUserMessage> SendMessageVideoPost(SocketInteractionContext ctx, MessageVideoPaged paged,  bool folloup = false)
         {
-            MessageImagePaged? page;
+            IUserMessage message;
 
-
-            if (imageMessage.TryGetValue(component.Message.Id, out page))
+            if (paged.Count > 1)
             {
-                if (component.User.Id != page.User.Id)
+                ComponentBuilder builder = new ComponentBuilder();
+
+                switch (paged.Options.Style)
+                {
+                    case DisplayStyle.Full:
+                        builder.WithButton("<--", "first", ButtonStyle.Secondary);
+                        builder.WithButton("<-", "back", ButtonStyle.Primary);
+                        builder.WithButton("X", "stop", ButtonStyle.Danger);
+                        builder.WithButton("->", "next", ButtonStyle.Primary);
+                        builder.WithButton("-->", "last", ButtonStyle.Secondary);
+                        break;
+
+                    case DisplayStyle.Minimal:
+                        builder.WithButton("<-", "back", ButtonStyle.Primary);
+                        builder.WithButton("X", "stop", ButtonStyle.Danger);
+                        builder.WithButton("->", "next", ButtonStyle.Primary);
+                        break;
+
+                    case DisplayStyle.Selector:
+                        builder.WithButton("<-", "back", ButtonStyle.Primary);
+                        builder.WithButton("Select", "select", ButtonStyle.Success);
+                        builder.WithButton("->", "next", ButtonStyle.Primary);
+                        break;
+
+                    case DisplayStyle.ViewerE:
+                        builder.WithButton("<--", "first", ButtonStyle.Secondary);
+                        builder.WithButton("<-", "back", ButtonStyle.Primary);
+                        builder.WithButton("X", "stop", ButtonStyle.Danger);
+                        builder.WithButton("->", "next", ButtonStyle.Primary);
+                        builder.WithButton("-->", "last", ButtonStyle.Secondary);
+                        builder.WithButton("Prev page", "p", ButtonStyle.Secondary, row:1);
+                        builder.WithButton("More", "n", ButtonStyle.Secondary, row: 1);                      
+                        break;
+                }
+
+                if (folloup)
+                {
+                    message = await ctx.Interaction.FollowupAsync(paged.GetMessage(), components: builder.Build());
+                } else
+                {
+                    await ctx.Interaction.RespondAsync(paged.GetMessage(), components: builder.Build());
+                    message = await ctx.Interaction.GetOriginalResponseAsync();
+                }
+
+            } else
+            {
+                if (folloup)
+                {
+                    message = await ctx.Interaction.FollowupAsync(paged.GetMessage());
+                } else
+                {
+                    await ctx.Interaction.RespondAsync(paged.GetMessage());
+                    message = await ctx.Interaction.GetOriginalResponseAsync();
+                }
+
+                return message;
+            }
+
+            if (videoMessage != null)
+            {
+                videoMessage.Add(message.Id, paged);
+            }
+            else
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (paged.Options.Timeout != TimeSpan.Zero)
+            {
+                Task _ = Task.Delay(paged.Options.Timeout).ContinueWith(async t =>
+                {
+                    if (!videoMessage.ContainsKey(message.Id))
+                    {
+                        return;
+                    }
+
+                    switch (paged.Options.TimeoutAction)
+                    {
+                        case StopAction.DeleteMessage:
+                            await message.DeleteAsync();
+                            break;
+                        case StopAction.Clear:
+                            await message.RemoveAllReactionsAsync();
+                            break;
+                    }
+
+                    imageMessage.Remove(message.Id);
+                });
+            }
+
+            return message;
+
+        }
+
+
+
+        // Оптимизировать вот эту хуйню
+
+        public async Task ButtonHandlerImage(SocketMessageComponent component)
+        {
+            MessageImagePaged? pageImage;
+            MessageVideoPaged? pageVideo;
+
+
+            if (imageMessage.TryGetValue(component.Message.Id, out pageImage))
+            {
+                if (component.User.Id != pageImage.User.Id)
                 {
                     return;
                 }
@@ -183,39 +338,39 @@ namespace HorryDragonProject.Service
                 switch (component.Data.CustomId)
                 {
                     case "first":
-                        if (page.CurrentPage != 1)
+                        if (pageImage.CurrentPage != 1)
                         {
-                            page.CurrentPage = 1;
-                            await component.UpdateAsync(x => x.Embed = page.GetEmbed());
+                            pageImage.CurrentPage = 1;
+                            await component.UpdateAsync(x => x.Embed = pageImage.GetEmbed());
                         }
                         break;
 
                     case "back":
-                        if (page.CurrentPage != 1)
+                        if (pageImage.CurrentPage != 1)
                         {
-                            page.CurrentPage--;
-                            await component.UpdateAsync(x => x.Embed = page.GetEmbed());
+                            pageImage.CurrentPage--;
+                            await component.UpdateAsync(x => x.Embed = pageImage.GetEmbed());
                         }
                         break;
 
                     case "next":
-                        if (page.CurrentPage != page.Count)
+                        if (pageImage.CurrentPage != pageImage.Count)
                         {
-                            page.CurrentPage++;
-                            await component.UpdateAsync(x => x.Embed = page.GetEmbed());
+                            pageImage.CurrentPage++;
+                            await component.UpdateAsync(x => x.Embed = pageImage.GetEmbed());
                         }
                         break;
 
                     case "last":
-                        if (page.CurrentPage != page.Count)
+                        if (pageImage.CurrentPage != pageImage.Count)
                         {
-                            page.CurrentPage = page.Count;
-                            await component.UpdateAsync(x => x.Embed = page.GetEmbed());
+                            pageImage.CurrentPage = pageImage.Count;
+                            await component.UpdateAsync(x => x.Embed = pageImage.GetEmbed());
                         }
                         break;
 
                     case "stop":
-                        switch (page.Options.OnStop)
+                        switch (pageImage.Options.OnStop)
                         {
                             case StopAction.DeleteMessage:
                                 await component.Message.DeleteAsync();
@@ -233,9 +388,88 @@ namespace HorryDragonProject.Service
                         await component.UpdateAsync(x => x.Components = null);
                         imageMessage.Remove(component.Message.Id);
                         break;
+
+                    case "n":
+                        await component.Message.DeleteAsync();
+                        imageMessage.Remove(component.Message.Id);
+                        break;
+
+                    case "p":
+                        break;
+                } 
+            } else if (videoMessage.TryGetValue(component.Message.Id, out pageVideo)) {
+
+                 if (component.User.Id != pageVideo.User.Id)
+                {
+                    return;
                 }
+
+                switch (component.Data.CustomId)
+                {
+                    case "first":
+                        if (pageVideo.CurrentPage != 1)
+                        {
+                            pageVideo.CurrentPage = 1;
+                            await component.UpdateAsync(x => x.Content = pageVideo.GetMessage());
+                        }
+                        break;
+
+                    case "back":
+                        if (pageVideo.CurrentPage != 1)
+                        {
+                            pageVideo.CurrentPage--;
+                            await component.UpdateAsync(x => x.Content = pageVideo.GetMessage());
+                        }
+                        break;
+
+                    case "next":
+                        if (pageVideo.CurrentPage != pageVideo.Count)
+                        {
+                            pageVideo.CurrentPage++;
+                            await component.UpdateAsync(x => x.Content = pageVideo.GetMessage());
+                        }
+                        break;
+
+                    case "last":
+                        if (pageVideo.CurrentPage != pageVideo.Count)
+                        {
+                            pageVideo.CurrentPage = pageVideo.Count;
+                            await component.UpdateAsync(x => x.Content = pageVideo.GetMessage());
+                        }
+                        break;
+
+                    case "stop":
+                        switch (pageVideo.Options.OnStop)
+                        {
+                            case StopAction.DeleteMessage:
+                                await component.Message.DeleteAsync();
+                                break;
+
+                            case StopAction.Clear:
+                                await component.UpdateAsync(x => x.Components = null);
+                                break;
+                        }
+
+                        imageMessage.Remove(component.Message.Id);
+                        break;
+
+                    case "select":
+                        await component.UpdateAsync(x => x.Components = null);
+                        imageMessage.Remove(component.Message.Id);
+                        break;
+
+                    case "n":
+                        await component.Message.DeleteAsync();
+                        imageMessage.Remove(component.Message.Id);
+                        break;
+
+                    case "p":
+                        break;
+                }
+                
             }
         }
+
         
     }
 }

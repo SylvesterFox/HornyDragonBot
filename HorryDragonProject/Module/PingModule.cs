@@ -11,7 +11,7 @@ namespace HorryDragonProject.Module {
         [SlashCommand("ping", "Ping Command")]
         public async Task PingCmd() {
             await RespondAsync("Pong!!");
-            _logger.LogInformation($"Send ping command! {Context.Client.Latency*1000}");
+            _logger.LogInformation($"Send ping command! {Context.Client.Latency/1000}");
         }
     }
 
