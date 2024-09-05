@@ -27,28 +27,36 @@ public class E621Module : BaseModule
  
     [SlashCommand("search", "Post viewer")]
     public async Task SearchCmd(string tag, [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null) {
-        await DeferAsync();
+        await DeferAsync(ephemeral: false);
         await _api.GetAllResponse(tag, type: type);
-        
-        if (type != "type:webm") {
+
+
+        if (_api.Response.Count != 0) {
+            if (type != "type:webm") {
             
-            List<EmbedBuilder> builders = _api.Response.Select(str => TemplateEmbeds.PostEmbedTemplate(str, tag)).ToList();
-        
-            await pagination.SendMessage(Context, new MessageImagePaged(builders, _api.Response, Context.User, new AppearanceOptions()
-            {
-                Timeout = TimeSpan.FromMinutes(20),
-                Style = DisplayStyle.Full,
-            }), folloup: true);
+                List<EmbedBuilder> builders = _api.Response.Select(str => TemplateEmbeds.PostEmbedTemplate(str, tag)).ToList();
+            
+                await pagination.SendMessage(Context, new MessageImagePaged(builders, _api.Response, Context.User, new AppearanceOptions()
+                {
+                    Timeout = TimeSpan.FromMinutes(20),
+                    Style = DisplayStyle.Full,
+                }), folloup: true);
 
 
             _logger.LogInformation($"Length post: {_api.Response.Count}");
+            } else {
+                List<string> messagePage = _api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
+                await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, _api.Response, Context.User, new AppearanceOptions() {
+                    Timeout = TimeSpan.FromMinutes(20),
+                    Style = DisplayStyle.Full
+                }), folloup: true);
+            }
+
         } else {
-            List<string> messagePage = _api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
-            await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, _api.Response, Context.User, new AppearanceOptions() {
-                Timeout = TimeSpan.FromMinutes(20),
-                Style = DisplayStyle.Full
-            }), folloup: true);
+            await FollowupAsync(embed: TemplateEmbeds.embedError("Response is null"));
         }
+        
+        
     }
 
 

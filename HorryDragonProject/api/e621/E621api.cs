@@ -32,7 +32,7 @@ namespace HorryDragonProject.api.e621{
 
                 var requrst = new RestRequest(uri, Method.Get);
 
-                requrst.AddParameter("tags", tag + $" {types}");
+                requrst.AddParameter("tags", tag + $" {types} rating:{reating} order:random");
                 requrst.AddParameter("limit", _limit);
                 requrst.AddParameter("page", _requrstPage);
 
@@ -44,9 +44,10 @@ namespace HorryDragonProject.api.e621{
                 if ((int)response.StatusCode != 200)
                 {
                     _logger.LogTrace("Error: " + response.Content);
-                    return null;
+                    return string.Empty;
                 } else
                 {
+                    
                     return response.Content;
                 }
             }
@@ -90,6 +91,7 @@ namespace HorryDragonProject.api.e621{
             }
 
             var _response = await _RequsetApi(_address, tags);
+
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
             if(deserializedResponse != null)

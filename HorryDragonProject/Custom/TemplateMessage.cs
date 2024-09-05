@@ -8,7 +8,7 @@ namespace HorryDragonProject.Custom {
         public static string SendVideoTemplate(Post post, string tag)
         {
             string message = $"> ## E621 video view message\n> ## Search tags:\n> ```{tag}```\n";
-            message += $"> [[Link source]]({post.File.Url}) | [Page e621](<https://e621.net/posts/{post.Id}>)";
+            message += $"> [[Link source]]({post.File.Url}) | [[Page e621]](<https://e621.net/posts/{post.Id}>)";
             return message;      
         }
     }

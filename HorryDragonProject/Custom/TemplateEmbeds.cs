@@ -11,7 +11,7 @@ namespace HorryDragonProject.Custom {
         private static Color _e621Color { get; } = Color.Blue;
 
         public static string footerText { get; } = "Dragofox property :b";
-        public static string footerIco { get; } = "https://media.discordapp.net/attachments/896091932000927745/1250845431823335537/dragofox_new_pfp.png?ex=66c6bad6&is=66c56956&hm=2e27c45b3d14fdd21cc8cf9b899e9dc4f9d95b7e5ee8df72a4e56380243a3b1b&=&format=webp&quality=lossless&width=575&height=450";
+        public static string footerIco { get; } = "https://media.discordapp.net/attachments/896091932000927745/1250845431823335537/dragofox_new_pfp.png?ex=66c6bad6&is=66c56956&hm=2e27c45b3d14fdd21cc8cf9b899e9dc4f9d95b7e5ee8df72a4e56380243a3b1b&=&format=webp";
 
         private static EmbedFooterBuilder _creatorName = new EmbedFooterBuilder() {
           Text = footerText,
@@ -93,7 +93,7 @@ namespace HorryDragonProject.Custom {
             foreach (EmbedBuilder builder in builders)
             {
 
-                builder.Footer ??= new EmbedFooterBuilder().WithText($"Page: {i++}/{builders.Count()} -- Post id:{post[n++].Id}");
+                builder.Footer ??= new EmbedFooterBuilder().WithText($"Page: {i++}/{builders.Count()} -- Post id:{post[n++].Id}").WithIconUrl(TemplateEmbeds.footerIco);
                 embeds.Add(builder.Build());
             }
             Pages = embeds;
