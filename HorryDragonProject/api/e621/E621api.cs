@@ -25,14 +25,22 @@ namespace HorryDragonProject.api.e621{
             _logger = log.CreateLogger("E621api");
         }
 
-        private async Task<string> _RequsetApi(string uri, string tag)
+        private async Task<string> _RequsetApi(string uri, string tag, bool random)
         {
             try
             {
 
                 var requrst = new RestRequest(uri, Method.Get);
 
-                requrst.AddParameter("tags", tag + $" {types} rating:{reating} order:random");
+                if (random)
+                {
+                    tag += $" {types} rating:{reating} order:random";
+                } else
+                {
+                    tag += $" {types} rating:{reating}";
+                }
+
+                requrst.AddParameter("tags", tag);
                 requrst.AddParameter("limit", _limit);
                 requrst.AddParameter("page", _requrstPage);
 
@@ -60,8 +68,8 @@ namespace HorryDragonProject.api.e621{
 
         public async Task<Post?> GetPost(string tags) {
 
-            var tag = $"{tags}+rating:{reating}";
-            var _response = await _RequsetApi(_address, tag);
+/*            var tag = $"{tags}+rating:{reating}";*/
+            var _response = await _RequsetApi(_address, tags, false);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
             if (deserializedResponse != null)
@@ -90,7 +98,7 @@ namespace HorryDragonProject.api.e621{
                 _limit = 320;
             }
 
-            var _response = await _RequsetApi(_address, tags);
+            var _response = await _RequsetApi(_address, tags, true);
 
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 

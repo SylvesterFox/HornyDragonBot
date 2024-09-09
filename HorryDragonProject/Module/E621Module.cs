@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using HorryDragonProject.api.e621;
 using HorryDragonProject.Custom;
@@ -26,8 +26,10 @@ public class E621Module : BaseModule
 
  
     [SlashCommand("search", "Post viewer")]
-    public async Task SearchCmd(string tag, [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null) {
-        await DeferAsync(ephemeral: false);
+    public async Task SearchCmd(string tag, 
+        [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null, 
+        [Summary("hide"), Autocomplete(typeof(ephemeralView))] bool hide = false) {
+        await DeferAsync(ephemeral: hide);
         await _api.GetAllResponse(tag, type: type);
 
 
@@ -55,7 +57,23 @@ public class E621Module : BaseModule
         } else {
             await FollowupAsync(embed: TemplateEmbeds.embedError("Response is null"));
         }
+
         
+        
+    }
+
+    [SlashCommand("test", "test")]
+    public async Task TestCmd()
+    {
+        var tag = $"dragon date:{DateTime.Today}";
+        var post = await _api.GetPost(tag);
+
+        if (post != null)
+        {
+            await FollowupAsync($"{post.CreatedAt}\n <{post.File.Url}>\n{post.Id}");
+        }
+
+        await FollowupAsync("Xyй");
         
     }
 
