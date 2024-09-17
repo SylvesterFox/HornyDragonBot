@@ -17,12 +17,16 @@ namespace HorryDragonProject.api.e621{
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
-        public E621api(string tokenApi, string user, ILoggerFactory log)
+        public E621api(string tokenApi, string user, ILoggerFactory? log = null)
         {
             _token = tokenApi;
             _user = user;
             _address = $"https://e621.net/posts.json";
-            _logger = log.CreateLogger("E621api");
+            if (log != null)
+            {
+                _logger = log.CreateLogger("E621api");
+            }
+            
         }
 
         private async Task<string> _RequsetApi(string uri, string tag, bool random)
@@ -83,7 +87,9 @@ namespace HorryDragonProject.api.e621{
             throw new NullReferenceException($"Response is null!");
         }
 
-        public async Task GetAllResponse(string tags, int linit = 320, string? type = "", string? page = null)
+
+
+        public async Task GetAllResponse(string tags, int linit = 320, string? type = "", string? page = null, bool random = true)
         {
             _limit = linit;
 
@@ -98,7 +104,7 @@ namespace HorryDragonProject.api.e621{
                 _limit = 320;
             }
 
-            var _response = await _RequsetApi(_address, tags, true);
+            var _response = await _RequsetApi(_address, tags, random);
 
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 

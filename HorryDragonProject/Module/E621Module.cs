@@ -62,21 +62,22 @@ public class E621Module : BaseModule
         
     }
 
-    [SlashCommand("test", "test")]
-    public async Task TestCmd()
+    [SlashCommand("start", "test start")]
+    public async Task StartCmd()
     {
-        var tag = $"dragon date:{DateTime.Today}";
-        var post = await _api.GetPost(tag);
 
-        if (post != null)
-        {
-            await FollowupAsync($"{post.CreatedAt}\n <{post.File.Url}>\n{post.Id}");
-        }
+        var watcher = new ServiceWatcherPost();
+        watcher.StartWatchig(TimeSpan.FromMinutes(1));
+    }
 
-        await FollowupAsync("Xyй");
-        
+    [SlashCommand("stop", "test stop")]
+    public async Task StopCmd()
+    {
+        var watcher = new ServiceWatcherPost();
+        watcher.StopWatchig();
+
     }
 
 
-    
+
 }
