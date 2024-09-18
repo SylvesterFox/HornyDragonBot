@@ -1,3 +1,4 @@
+using HorryDragonProject.Settings;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using System.Text.Json;
@@ -6,10 +7,12 @@ namespace HorryDragonProject.api.e621{
     public class E621api
     {
 
-        public readonly ILogger _logger;    
+        /*        public readonly ILogger _logger;    */
+        // C?????? ??? ???????????!
         private string _address;
         private string _user;
         private string _token;
+        private readonly BotConfig? _botConfig;
         private int _limit { get; set; } = 1;
 
         private string _requrstPage { get; set; } = "1";
@@ -17,15 +20,12 @@ namespace HorryDragonProject.api.e621{
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
-        public E621api(string tokenApi, string user, ILoggerFactory? log = null)
+        public E621api()
         {
-            _token = tokenApi;
-            _user = user;
+            _botConfig = BotSettingInit.Instance.LoadedConfig;
+            _token = _botConfig.TOKEN_E621;
+            _user = _botConfig.USER_E621;
             _address = $"https://e621.net/posts.json";
-            if (log != null)
-            {
-                _logger = log.CreateLogger("E621api");
-            }
             
         }
 
@@ -55,7 +55,7 @@ namespace HorryDragonProject.api.e621{
                 var response = await restApi.ExecuteAsync(requrst);
                 if ((int)response.StatusCode != 200)
                 {
-                    _logger.LogTrace("Error: " + response.Content);
+                    Console.WriteLine("Error: " + response.Content);
                     return string.Empty;
                 } else
                 {

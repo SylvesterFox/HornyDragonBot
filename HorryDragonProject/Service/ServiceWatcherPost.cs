@@ -1,23 +1,28 @@
 ﻿
+using Discord.WebSocket;
 using HorryDragonProject.api.e621;
-using HorryDragonProject.Settings;
+using HorryDragonProject.Custom;
+using Microsoft.Extensions.Logging;
 
 
 namespace HorryDragonProject.Service
 {
-    internal class ServiceWatcherPost
+    public class ServiceWatcherPost
     {
-        private HashSet<int> _lastPostIds;
+        /*private HashSet<int> _lastPostIds;*/
+        private readonly List<QueryData> _queries;
         private Timer _timer;
         private readonly E621api _api;
-        private readonly BotConfig? _botConfig;
+        private SocketTextChannel _textChannel;
+        private readonly DiscordSocketClient _client;
+        public readonly ILogger _logger;
 
-        public ServiceWatcherPost()
+        public ServiceWatcherPost(DiscordSocketClient client, ILogger<ServiceWatcherPost> logger)
         {
-            _lastPostIds = new HashSet<int>();
-            _botConfig = BotSettingInit.Instance.LoadedConfig;
-            _api = new E621api(_botConfig.TOKEN_E621, _botConfig.USER_E621);
-            
+            _queries = new List<QueryData>();
+            _api = new E621api();
+            _client = client;
+            _logger = logger;
         }
 
         public void StartWatchig(TimeSpan interval)
@@ -29,37 +34,60 @@ namespace HorryDragonProject.Service
             _timer?.Change(Timeout.Infinite, 0);
         }
 
+        public void TagQueries(List<string> queries)
+        {
+            foreach (var query in queries)
+            {
+                _queries.Add(new QueryData
+                {
+                    Tags = query,
+                    LastPostIds = new HashSet<int>()
+                });
+            }
+        }
+
         private async Task CheckForNewPost()
         {
-            var tag = "dragon";
-            Console.WriteLine("\n\n");
-            try
+           foreach(var query in _queries)
             {
-                HashSet<int> newPostIds = new HashSet<int>();
-                await _api.GetAllResponse(tag, linit: 1, random: false);
-
-                if (_api.Response == null)
+                var tag = query.Tags;
+                try
                 {
-                    return;
-                }
+                    _textChannel = (SocketTextChannel)_client.GetChannel(918184699405426738);
+                    HashSet<int> newPostIds = new HashSet<int>();
+                    await _api.GetAllResponse(tag, linit: 1, random: false);
 
-                foreach (var post in _api.Response)
-                {
-                    newPostIds.Add(post.Id);
-
-                    if (!_lastPostIds.Contains(post.Id))
+                    if (_api.Response == null)
                     {
-                        Console.WriteLine($"New post ID: {post.Id}");
-                        Console.WriteLine($"Created At: {post.CreatedAt}");
-                        Console.WriteLine($"File url: {post.File.Url}");
+                        return;
                     }
-                }
 
-                _lastPostIds = newPostIds;
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                    foreach (var post in _api.Response)
+                    {
+                        newPostIds.Add(post.Id);
+
+                        if (!query.LastPostIds.Contains(post.Id))
+                        {
+                            _logger.LogDebug($"\nNew post ID: {post.Id}\nCreated At: {post.CreatedAt}\nFile url: {post.File.Url}");
+                            await _textChannel.SendMessageAsync(embed: TemplateEmbeds.PostEmbedTemplate(post, tag).Build());
+                        }
+                    }
+
+                    query.LastPostIds = newPostIds;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
+
+            
+        }
+
+        private class QueryData
+        {
+            public string Tags { get; set; }
+            public HashSet<int> LastPostIds { get; set; }
         }
     }
 }

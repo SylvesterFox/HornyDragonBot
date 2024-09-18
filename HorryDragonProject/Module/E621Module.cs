@@ -4,7 +4,6 @@ using HorryDragonProject.api.e621;
 using HorryDragonProject.Custom;
 using HorryDragonProject.Handlers;
 using HorryDragonProject.Service;
-using HorryDragonProject.Settings;
 using Microsoft.Extensions.Logging;
 
 namespace HorryDragonProject.Module;
@@ -12,16 +11,14 @@ namespace HorryDragonProject.Module;
 [Group("e621", "e621 commands")]
 public class E621Module : BaseModule
 {
-    private readonly BotConfig? _botConfig;
     private readonly E621api _api;
     public ServicePaged pagination { private get; set; }
+    public ServiceWatcherPost watcherPost { private get; set; }
 
 
     public E621Module(ILoggerFactory log) : base(log)
     {
-        _botConfig = BotSettingInit.Instance.LoadedConfig;
-        _api = new E621api(_botConfig.TOKEN_E621, _botConfig.USER_E621, log);
-
+        _api = new E621api();
     }
 
  
@@ -65,16 +62,22 @@ public class E621Module : BaseModule
     [SlashCommand("start", "test start")]
     public async Task StartCmd()
     {
-
-        var watcher = new ServiceWatcherPost();
-        watcher.StartWatchig(TimeSpan.FromMinutes(1));
+        var tagQueries = new List<string>
+        {
+            "dragon",
+            "wolf",
+            "knot"
+        };
+        watcherPost.TagQueries(tagQueries);
+        watcherPost.StartWatchig(TimeSpan.FromMinutes(1));
+        await RespondAsync("start autoposting..");
     }
 
     [SlashCommand("stop", "test stop")]
     public async Task StopCmd()
     {
-        var watcher = new ServiceWatcherPost();
-        watcher.StopWatchig();
+        watcherPost.StopWatchig();
+        await RespondAsync("stop autoposting..");
 
     }
 
