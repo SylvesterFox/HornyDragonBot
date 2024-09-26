@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using HorryDragonProject.api.e621;
 using HorryDragonProject.Custom;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 
@@ -9,18 +10,17 @@ namespace HorryDragonProject.Service
 {
     public class ServiceWatcherPost
     {
-        /*private HashSet<int> _lastPostIds;*/
         private readonly List<QueryData> _queries;
         private Timer _timer;
-        private readonly E621api _api;
         private SocketTextChannel _textChannel;
         private readonly DiscordSocketClient _client;
         public readonly ILogger _logger;
+        public E621api api { private get; set; }
 
-        public ServiceWatcherPost(DiscordSocketClient client, ILogger<ServiceWatcherPost> logger)
+        public ServiceWatcherPost(DiscordSocketClient client, ILogger<ServiceWatcherPost> logger, IServiceProvider service)
         {
             _queries = new List<QueryData>();
-            _api = new E621api();
+            api = service.GetRequiredService<E621api>();
             _client = client;
             _logger = logger;
         }
@@ -55,14 +55,14 @@ namespace HorryDragonProject.Service
                 {
                     _textChannel = (SocketTextChannel)_client.GetChannel(918184699405426738);
                     HashSet<int> newPostIds = new HashSet<int>();
-                    await _api.GetAllResponse(tag, linit: 1, random: false);
+                    await api.GetAllResponse(tag, linit: 1, random: false);
 
-                    if (_api.Response == null)
+                    if (api.Response == null)
                     {
                         return;
                     }
 
-                    foreach (var post in _api.Response)
+                    foreach (var post in api.Response)
                     {
                         newPostIds.Add(post.Id);
 

@@ -7,8 +7,7 @@ namespace HorryDragonProject.api.e621{
     public class E621api
     {
 
-        /*        public readonly ILogger _logger;    */
-        // C?????? ??? ???????????!
+        public readonly ILogger _logger;
         private string _address;
         private string _user;
         private string _token;
@@ -20,13 +19,13 @@ namespace HorryDragonProject.api.e621{
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
-        public E621api()
+        public E621api(ILogger<E621api> logger)
         {
             _botConfig = BotSettingInit.Instance.LoadedConfig;
             _token = _botConfig.TOKEN_E621;
             _user = _botConfig.USER_E621;
             _address = $"https://e621.net/posts.json";
-            
+            _logger = logger;
         }
 
         private async Task<string> _RequsetApi(string uri, string tag, bool random)
@@ -55,24 +54,23 @@ namespace HorryDragonProject.api.e621{
                 var response = await restApi.ExecuteAsync(requrst);
                 if ((int)response.StatusCode != 200)
                 {
-                    Console.WriteLine("Error: " + response.Content);
+                    _logger.LogTrace("[Error] " + response.Content);
                     return string.Empty;
                 } else
                 {
-                    
+                    _logger.LogDebug($"{response.ResponseStatus} Code: {response.StatusCode}");
                     return response.Content;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogTrace("[Error] " +  ex.Message);
                 throw new HttpRequestException(HttpRequestError.ConnectionError);
             }
         }
 
         public async Task<Post?> GetPost(string tags) {
 
-/*            var tag = $"{tags}+rating:{reating}";*/
             var _response = await _RequsetApi(_address, tags, false);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 

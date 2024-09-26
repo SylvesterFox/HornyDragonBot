@@ -5,6 +5,8 @@
         public string TOKEN_E621 { get; set; } = string.Empty;
         public string USER_E621 { get; set; } = string.Empty;
         public string LOGS { get; set; } = "info";
+
+        public int POSTERINTERLAL { get; set; } = 300000;
     }
 
 }

@@ -11,14 +11,14 @@ namespace HorryDragonProject.Module;
 [Group("e621", "e621 commands")]
 public class E621Module : BaseModule
 {
-    private readonly E621api _api;
     public ServicePaged pagination { private get; set; }
     public ServiceWatcherPost watcherPost { private get; set; }
+
+    public E621api api { private get; set; }
 
 
     public E621Module(ILoggerFactory log) : base(log)
     {
-        _api = new E621api();
     }
 
  
@@ -27,25 +27,25 @@ public class E621Module : BaseModule
         [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null, 
         [Summary("hide"), Autocomplete(typeof(ephemeralView))] bool hide = false) {
         await DeferAsync(ephemeral: hide);
-        await _api.GetAllResponse(tag, type: type);
+        await api.GetAllResponse(tag, type: type);
 
 
-        if (_api.Response.Count != 0) {
+        if (api.Response.Count != 0) {
             if (type != "type:webm") {
             
-                List<EmbedBuilder> builders = _api.Response.Select(str => TemplateEmbeds.PostEmbedTemplate(str, tag)).ToList();
+                List<EmbedBuilder> builders = api.Response.Select(str => TemplateEmbeds.PostEmbedTemplate(str, tag)).ToList();
             
-                await pagination.SendMessage(Context, new MessageImagePaged(builders, _api.Response, Context.User, new AppearanceOptions()
+                await pagination.SendMessage(Context, new MessageImagePaged(builders, api.Response, Context.User, new AppearanceOptions()
                 {
                     Timeout = TimeSpan.FromMinutes(20),
                     Style = DisplayStyle.Full,
                 }), folloup: true);
 
 
-            _logger.LogInformation($"Length post: {_api.Response.Count}");
+            _logger.LogInformation($"Length post: {api.Response.Count}");
             } else {
-                List<string> messagePage = _api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
-                await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, _api.Response, Context.User, new AppearanceOptions() {
+                List<string> messagePage = api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
+                await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, api.Response, Context.User, new AppearanceOptions() {
                     Timeout = TimeSpan.FromMinutes(20),
                     Style = DisplayStyle.Full
                 }), folloup: true);
@@ -69,7 +69,7 @@ public class E621Module : BaseModule
             "knot"
         };
         watcherPost.TagQueries(tagQueries);
-        watcherPost.StartWatchig(TimeSpan.FromMinutes(1));
+        watcherPost.StartWatchig(TimeSpan.FromMilliseconds(300000));
         await RespondAsync("start autoposting..");
     }
 
