@@ -17,18 +17,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-<<<<<<< HEAD
-<<<<<<< main
-=======
-    <PackageReference Include="RestSharp" Version="112.0.0" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HorryDragonDatabase\HorryDragonDatabase.csproj" />
->>>>>>> local
-=======
-    <PackageReference Include="RestSharp" Version="111.4.1" />
->>>>>>> c820e07fe5429289767fe8f016bbbb701250fce7
+    <PackageReference Include="RestSharp" Version="112.0.0" />
   </ItemGroup>
 
 
