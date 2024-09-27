@@ -2,8 +2,10 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DragonData.Context;
 using HorryDragonProject.Handlers;
 using HorryDragonProject.Settings;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -31,8 +33,22 @@ namespace HorryDragonProject {
 
 
 
+         private static async Task setupDatabaseTask(DatabaseContext context) {
+            var migrations = await context.Database.GetPendingMigrationsAsync();
+            if (migrations.Any()) {
+                Console.WriteLine("===== Migrations required: " + string.Join(", ", migrations) + " =====");
+                await context.Database.MigrateAsync();
+                await context.SaveChangesAsync();
+            }
+            
+            await context.Database.EnsureCreatedAsync();
+        }
+
+
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var context = _service.GetRequiredService<DatabaseContext>();
             var _sCommand = _service.GetRequiredService<InteractionService>();
             await _service.GetRequiredService<InteractionHandler>().InitInteraction();
              
@@ -41,7 +57,7 @@ namespace HorryDragonProject {
                 await _sCommand.RegisterCommandsGloballyAsync(true);
                 Console.WriteLine("Starting rawr bot..");
                 Console.WriteLine($"Ver: {Assembly.GetEntryAssembly()?.GetName().Version} ");
-
+                await setupDatabaseTask(context);
             };
 
             

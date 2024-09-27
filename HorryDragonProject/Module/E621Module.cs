@@ -42,7 +42,7 @@ public class E621Module : BaseModule
                 }), folloup: true);
 
 
-            _logger.LogInformation($"Length post: {api.Response.Count}");
+            logger.LogInformation($"Length post: {api.Response.Count}");
             } else {
                 List<string> messagePage = api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
                 await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, api.Response, Context.User, new AppearanceOptions() {

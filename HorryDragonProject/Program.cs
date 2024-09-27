@@ -6,6 +6,8 @@ using HorryDragonProject.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using DragonData.Context;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace HorryDragonProject {
@@ -21,8 +23,14 @@ namespace HorryDragonProject {
                 return;
             }
 
-            var builder = new HostApplicationBuilder();
+            var path = DbSettings.LocalPathDB();
 
+            var builder = new HostApplicationBuilder();
+            builder.Services.AddDbContextFactory<DatabaseContext>(
+                options => {
+                    options.UseSqlite($"Data Source={path}");
+                }
+            );
 
 
             builder.Services.AddSingleton<LogHandler>();
