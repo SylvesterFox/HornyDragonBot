@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HorryDragonProject", "HorryDragonProject\HorryDragonProject.csproj", "{FBDACF92-52F4-46F3-BB04-94E94177B3A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HorryDragonProject", "HorryDragonProject\HorryDragonProject.csproj", "{FBDACF92-52F4-46F3-BB04-94E94177B3A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HorryDragonDatabase", "HorryDragonDatabase\HorryDragonDatabase.csproj", "{4405B5D0-9843-4525-BBC2-D835CA7044A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +20,18 @@ Global
 		{FBDACF92-52F4-46F3-BB04-94E94177B3A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBDACF92-52F4-46F3-BB04-94E94177B3A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBDACF92-52F4-46F3-BB04-94E94177B3A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4405B5D0-9843-4525-BBC2-D835CA7044A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4405B5D0-9843-4525-BBC2-D835CA7044A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4405B5D0-9843-4525-BBC2-D835CA7044A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4405B5D0-9843-4525-BBC2-D835CA7044A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+<<<<<<< main
+=======
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {80D7A02D-826A-4E94-9BBB-3A569C89E917}
+	EndGlobalSection
+>>>>>>> local
 EndGlobal
