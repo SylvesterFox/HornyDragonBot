@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using DragonData;
 using HorryDragonProject.api.e621;
 using HorryDragonProject.Custom;
 using HorryDragonProject.Handlers;
@@ -14,6 +15,7 @@ public class E621Module : BaseModule
     public ServicePaged pagination { private get; set; }
     public ServiceWatcherPost watcherPost { private get; set; }
 
+    public DragonDataBase dragonDataBase { private get; set; }
     public E621api api { private get; set; }
 
 
@@ -81,6 +83,24 @@ public class E621Module : BaseModule
 
     }
 
+    [SlashCommand("add-blocklist-for-guild", "Add blocklist tag for guild")]
+    public async Task GuildBlockListAddCmd(string tag) {
+        await DeferAsync();
 
+        await dragonDataBase.SetBlocklistForGuild(Context.Guild, $"-{tag}");
+        await FollowupAsync($"Add blocklist tag: -{tag}");
+    }
 
+    [SlashCommand("get-guild-blocklist", " Get list blocklist-tag for guild")]
+    public async Task GetGuildBlocklistCmd() {
+        await DeferAsync();
+        var list = dragonDataBase.GetGuildBlockList(Context.Guild);
+        string text = "";
+        foreach (var blocktag in list) {
+            text += blocktag.blockTag + string.Join("", " ");
+        }
+
+        Console.WriteLine(text);
+        await FollowupAsync(text);
+    }
 }

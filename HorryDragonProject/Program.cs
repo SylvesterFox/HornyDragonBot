@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using DragonData.Context;
 using Microsoft.EntityFrameworkCore;
+using DragonData;
 
 
 namespace HorryDragonProject {
@@ -31,7 +32,7 @@ namespace HorryDragonProject {
                     options.UseSqlite($"Data Source={path}");
                 }
             );
-
+            builder.Services.AddSingleton<DragonDataBase>();
 
             builder.Services.AddSingleton<LogHandler>();
             builder.Services.AddSingleton<E621api>();

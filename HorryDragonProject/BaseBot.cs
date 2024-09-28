@@ -59,9 +59,7 @@ namespace HorryDragonProject {
                 Console.WriteLine($"Ver: {Assembly.GetEntryAssembly()?.GetName().Version} ");
                 await setupDatabaseTask(context);
             };
-
-            
-            
+ 
 
             await _client.LoginAsync(TokenType.Bot, _botConfig.TOKEN_BOT);
             await _client.StartAsync();
