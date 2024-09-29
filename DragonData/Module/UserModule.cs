@@ -1,14 +1,14 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DragonData.Module;
 
-public class GuildModule
+public class UserModule
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public ulong guildID { get; set; }
-    public string guildName { get; set; }
-
-    public ICollection<GuildBlockListModule> GuildblockLists { get; set; }
+    public ulong userID { get; set; }
+    public string username { get; set; }
+    public ICollection<BlocklistModule> Blocklists { get; set; }
 }

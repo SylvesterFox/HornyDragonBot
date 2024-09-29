@@ -11,11 +11,16 @@ public class DatabaseContext : DbContext
     }
 
     public DbSet<GuildModule> Guilds { get; set; }
-    public DbSet<BlockListModule> blockLists { get; set; }
+    public DbSet<UserModule> Users { get; set; }
+    public DbSet<BlocklistModule> blocklists { get; set; } 
+    public DbSet<GuildBlockListModule> GuildBlockLists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<GuildModule>()
             .HasKey(e => e.guildID);
+
+        modelBuilder.Entity<UserModule>()
+            .HasKey(e => e.userID);
     }
 }

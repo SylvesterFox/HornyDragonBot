@@ -91,6 +91,13 @@ public class E621Module : BaseModule
         await FollowupAsync($"Add blocklist tag: -{tag}");
     }
 
+    [SlashCommand("add-blocklist", "Add blocklist tag")]
+    public async Task BlockListAddCmd(string tag) {
+        await DeferAsync();
+        await dragonDataBase.SetBlocklist(Context.User, $"-{tag}");
+        await FollowupAsync($"Add blocklist tag: -{tag}");
+    }
+
     [SlashCommand("get-guild-blocklist", " Get list blocklist-tag for guild")]
     public async Task GetGuildBlocklistCmd() {
         await DeferAsync();
@@ -100,7 +107,19 @@ public class E621Module : BaseModule
             text += blocktag.blockTag + string.Join("", " ");
         }
 
-        Console.WriteLine(text);
-        await FollowupAsync(text);
+        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).Build());
+    }
+
+
+    [SlashCommand("get-blocklist", " Get list blocklist-tag for guild")]
+    public async Task GetBlocklistCmd() {
+        await DeferAsync();
+        var list = dragonDataBase.GetBlocklists(Context.User);
+        string text = "";
+        foreach (var blocktag in list) {
+             text += blocktag.blockTag + string.Join("", " ");
+        }
+
+        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).Build());
     }
 }

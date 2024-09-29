@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DragonData.Module;
 
-public class BlockListModule
+public class GuildBlockListModule
 {
     [Key]
     public int blockID { get; set; }
