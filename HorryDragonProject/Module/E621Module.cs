@@ -18,19 +18,25 @@ public class E621Module : BaseModule
     public DragonDataBase dragonDataBase { private get; set; }
     public E621api api { private get; set; }
 
+    public E621blocklist blocklist { private get; set; }
 
     public E621Module(ILoggerFactory log) : base(log)
     {
     }
 
- 
+   
     [SlashCommand("search", "Post viewer")]
     public async Task SearchCmd(string tag, 
         [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null, 
         [Summary("hide"), Autocomplete(typeof(ephemeralView))] bool hide = false) {
         await DeferAsync(ephemeral: hide);
-        await api.GetAllResponse(tag, type: type);
 
+        await blocklist.BlocklistForUser(Context.User);
+        blocklist.UseBlocklist(Context.User);
+
+        await api.GetAllResponse(tag, type: type);
+        
+       
 
         if (api.Response.Count != 0) {
             if (type != "type:webm") {
@@ -43,8 +49,6 @@ public class E621Module : BaseModule
                     Style = DisplayStyle.Full,
                 }), folloup: true);
 
-
-            logger.LogInformation($"Length post: {api.Response.Count}");
             } else {
                 List<string> messagePage = api.Response.Select(str => TemplateMessage.SendVideoTemplate(str, tag)).ToList();
                 await pagination.SendMessageVideoPost(Context, new MessageVideoPaged(messagePage, api.Response, Context.User, new AppearanceOptions() {
@@ -53,12 +57,11 @@ public class E621Module : BaseModule
                 }), folloup: true);
             }
 
+            logger.LogInformation($"Length post: {api.Response.Count}");
         } else {
             await FollowupAsync(embed: TemplateEmbeds.embedError("Response is null"));
         }
 
-        
-        
     }
 
     [SlashCommand("start", "test start")]
@@ -87,14 +90,14 @@ public class E621Module : BaseModule
     public async Task GuildBlockListAddCmd(string tag) {
         await DeferAsync();
 
-        await dragonDataBase.SetBlocklistForGuild(Context.Guild, $"-{tag}");
+        await dragonDataBase.SetBlocklistForGuild(Context.Guild, tag);
         await FollowupAsync($"Add blocklist tag: -{tag}");
     }
 
     [SlashCommand("add-blocklist", "Add blocklist tag")]
     public async Task BlockListAddCmd(string tag) {
         await DeferAsync();
-        await dragonDataBase.SetBlocklist(Context.User, $"-{tag}");
+        await dragonDataBase.SetBlocklist(Context.User, tag);
         await FollowupAsync($"Add blocklist tag: -{tag}");
     }
 
@@ -103,23 +106,28 @@ public class E621Module : BaseModule
         await DeferAsync();
         var list = dragonDataBase.GetGuildBlockList(Context.Guild);
         string text = "";
-        foreach (var blocktag in list) {
-            text += blocktag.blockTag + string.Join("", " ");
-        }
+        text += string.Join(" ", list.Select(x => "-" + x.blockTag));
 
-        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).Build());
+
+        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).WithTitle("Guild blocklist tags").Build());
     }
 
 
-    [SlashCommand("get-blocklist", " Get list blocklist-tag for guild")]
+    [SlashCommand("get-blocklist", "Get list blocklist-tag for guild")]
     public async Task GetBlocklistCmd() {
         await DeferAsync();
         var list = dragonDataBase.GetBlocklists(Context.User);
         string text = "";
-        foreach (var blocktag in list) {
-             text += blocktag.blockTag + string.Join("", " ");
-        }
+        text += string.Join(" ", list.Select(x => "-" + x.blockTag));
+  
+        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).WithTitle("Blocklist tags").Build());
+    }
 
-        await FollowupAsync(embed: new EmbedBuilder().WithDescription(Format.Code(text)).WithColor(Color.DarkBlue).Build());
+    [SlashCommand("delete-blocklist", "Delete tag from user blocklist")]
+    public async Task DeleteBlocklistCmd(string tag)
+    {
+        await DeferAsync();
+        await dragonDataBase.DeleteTagFromBlocklist(Context.User, tag);
+        await FollowupAsync($"Delete tag from blocklist: {tag}");
     }
 }

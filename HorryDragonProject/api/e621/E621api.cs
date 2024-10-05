@@ -13,11 +13,13 @@ namespace HorryDragonProject.api.e621{
         private string _token;
         private readonly BotConfig? _botConfig;
         private int _limit { get; set; } = 1;
-
+        
         private string _requrstPage { get; set; } = "1";
         public string reating { get; set; } = "e";
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
+
+        public List<string> BlockTag = new List<string>();
 
         public E621api(ILogger<E621api> logger)
         {
@@ -41,6 +43,13 @@ namespace HorryDragonProject.api.e621{
                 } else
                 {
                     tag += $" {types} rating:{reating}";
+                }
+
+                if (BlockTag.Count != 0)
+                {
+                    string urlblocklist = string.Join(" ", BlockTag.Select(x => "-" + x));
+                    tag += urlblocklist;
+                    _logger.LogDebug($"Blocklist {urlblocklist}");
                 }
 
                 requrst.AddParameter("tags", tag);

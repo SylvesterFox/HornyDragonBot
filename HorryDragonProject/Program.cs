@@ -36,6 +36,7 @@ namespace HorryDragonProject {
 
             builder.Services.AddSingleton<LogHandler>();
             builder.Services.AddSingleton<E621api>();
+            builder.Services.AddSingleton<E621blocklist>();
             builder.Services.AddSingleton<ServiceWatcherPost>();
             builder.Services.AddSingleton(X => new InteractionService(X.GetRequiredService<DiscordSocketClient>()));
             builder.Services.AddSingleton<InteractionHandler>();

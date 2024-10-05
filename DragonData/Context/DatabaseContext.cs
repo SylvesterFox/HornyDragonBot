@@ -22,5 +22,7 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<UserModule>()
             .HasKey(e => e.userID);
+        modelBuilder.Entity<BlocklistModule>()
+            .HasKey(e => e.blockTag);
     }
 }

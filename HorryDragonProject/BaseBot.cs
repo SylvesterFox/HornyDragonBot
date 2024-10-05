@@ -33,17 +33,17 @@ namespace HorryDragonProject {
 
 
 
-         private static async Task setupDatabaseTask(DatabaseContext context) {
-            var migrations = await context.Database.GetPendingMigrationsAsync();
-            if (migrations.Any()) {
-                Console.WriteLine("===== Migrations required: " + string.Join(", ", migrations) + " =====");
-                await context.Database.MigrateAsync();
-                await context.SaveChangesAsync();
-            }
-            
-            await context.Database.EnsureCreatedAsync();
+        private static async Task setupDatabaseTask(DatabaseContext context) {
+        var migrations = await context.Database.GetPendingMigrationsAsync();
+        if (migrations.Any()) {
+            Console.WriteLine("===== Migrations required: " + string.Join(", ", migrations) + " =====");
+            await context.Database.MigrateAsync();
+            await context.SaveChangesAsync();
         }
-
+            
+        await context.Database.EnsureCreatedAsync();
+        }
+        
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
