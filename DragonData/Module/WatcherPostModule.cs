@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DragonData.Module;
 
-public class GuildModule
+public class WatcherPostModule
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public ulong channelID { get; set; }
     public ulong guildID { get; set; }
-    public string guildName { get; set; }
-
-    public ICollection<GuildBlockListModule> GuildblockLists { get; set; }
-    public ICollection<WatcherPostModule> WatcherPost { get; set;}
+    public GuildModule guild { get; set; }
+    public string watchTags { get; set; }
 }

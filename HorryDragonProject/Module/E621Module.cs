@@ -31,13 +31,9 @@ public class E621Module : BaseModule
         [Summary("hide"), Autocomplete(typeof(ephemeralView))] bool hide = false) {
         await DeferAsync(ephemeral: hide);
 
-        await blocklist.BlocklistForUser(Context.User);
-        blocklist.UseBlocklist(Context.User);
-
-        await api.GetAllResponse(tag, type: type);
+        await blocklist.UseBlocklist(Context.User);
+        await api.GetAllResponse(tag, type: type, user: Context.User);
         
-       
-
         if (api.Response.Count != 0) {
             if (type != "type:webm") {
             
@@ -90,21 +86,21 @@ public class E621Module : BaseModule
     public async Task GuildBlockListAddCmd(string tag) {
         await DeferAsync();
 
-        await dragonDataBase.SetBlocklistForGuild(Context.Guild, tag);
+        await dragonDataBase.blocklist.AddBlocklistForGuild(Context.Guild, tag);
         await FollowupAsync($"Add blocklist tag: -{tag}");
     }
 
     [SlashCommand("add-blocklist", "Add blocklist tag")]
     public async Task BlockListAddCmd(string tag) {
         await DeferAsync();
-        await dragonDataBase.SetBlocklist(Context.User, tag);
+        await dragonDataBase.blocklist.AddBlocklist(Context.User, tag);
         await FollowupAsync($"Add blocklist tag: -{tag}");
     }
 
     [SlashCommand("get-guild-blocklist", " Get list blocklist-tag for guild")]
     public async Task GetGuildBlocklistCmd() {
         await DeferAsync();
-        var list = dragonDataBase.GetGuildBlockList(Context.Guild);
+        var list = dragonDataBase.blocklist.GetGuildBlockList(Context.Guild);
         string text = "";
         text += string.Join(" ", list.Select(x => "-" + x.blockTag));
 
@@ -116,7 +112,7 @@ public class E621Module : BaseModule
     [SlashCommand("get-blocklist", "Get list blocklist-tag for guild")]
     public async Task GetBlocklistCmd() {
         await DeferAsync();
-        var list = dragonDataBase.GetBlocklists(Context.User);
+        var list = dragonDataBase.blocklist.GetBlocklists(Context.User);
         string text = "";
         text += string.Join(" ", list.Select(x => "-" + x.blockTag));
   
@@ -127,7 +123,7 @@ public class E621Module : BaseModule
     public async Task DeleteBlocklistCmd(string tag)
     {
         await DeferAsync();
-        await dragonDataBase.DeleteTagFromBlocklist(Context.User, tag);
+        await dragonDataBase.blocklist.DeleteTagFromBlocklist(Context.User, tag);
         await FollowupAsync($"Delete tag from blocklist: {tag}");
     }
 }

@@ -1,3 +1,4 @@
+using Discord.WebSocket;
 using HorryDragonProject.Settings;
 using Microsoft.Extensions.Logging;
 using RestSharp;
@@ -19,7 +20,7 @@ namespace HorryDragonProject.api.e621{
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
-        public List<string> BlockTag = new List<string>();
+        public Dictionary<ulong, string> BlockTag = new Dictionary<ulong, string>();
 
         public E621api(ILogger<E621api> logger)
         {
@@ -30,7 +31,7 @@ namespace HorryDragonProject.api.e621{
             _logger = logger;
         }
 
-        private async Task<string> _RequsetApi(string uri, string tag, bool random)
+        private async Task<string> _RequsetApi(string uri, string tag, bool random, SocketUser? socketUser, SocketGuild? socketGuild)
         {
             try
             {
@@ -45,11 +46,13 @@ namespace HorryDragonProject.api.e621{
                     tag += $" {types} rating:{reating}";
                 }
 
-                if (BlockTag.Count != 0)
+                if (socketUser != null && BlockTag.Count != 0)
                 {
-                    string urlblocklist = string.Join(" ", BlockTag.Select(x => "-" + x));
-                    tag += urlblocklist;
-                    _logger.LogDebug($"Blocklist {urlblocklist}");
+                    tag += BlockTag[socketUser.Id];
+                    _logger.LogDebug($"Blocklist {BlockTag[socketUser.Id]}");
+                } else if (socketGuild != null && BlockTag.Count != 0) {
+                    tag += BlockTag[socketGuild.Id];
+                    _logger.LogDebug($"Blocklist {BlockTag[socketGuild.Id]}");
                 }
 
                 requrst.AddParameter("tags", tag);
@@ -78,9 +81,9 @@ namespace HorryDragonProject.api.e621{
             }
         }
 
-        public async Task<Post?> GetPost(string tags) {
+        public async Task<Post?> GetPost(string tags, SocketUser? user = null, SocketGuild? guild = null) {
 
-            var _response = await _RequsetApi(_address, tags, false);
+            var _response = await _RequsetApi(_address, tags, false, user, guild);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
             if (deserializedResponse != null)
@@ -96,7 +99,11 @@ namespace HorryDragonProject.api.e621{
 
 
 
-        public async Task GetAllResponse(string tags, int linit = 320, string? type = "", string? page = null, bool random = true)
+        public async Task GetAllResponse(string tags, 
+        int linit = 320, 
+        string? type = "",  
+        bool random = true, 
+        SocketUser? user = null, SocketGuild? guild = null)
         {
             _limit = linit;
 
@@ -111,7 +118,7 @@ namespace HorryDragonProject.api.e621{
                 _limit = 320;
             }
 
-            var _response = await _RequsetApi(_address, tags, random);
+            var _response = await _RequsetApi(_address, tags, random, user, guild);
 
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 

@@ -15,6 +15,8 @@ public class DatabaseContext : DbContext
     public DbSet<BlocklistModule> blocklists { get; set; } 
     public DbSet<GuildBlockListModule> GuildBlockLists { get; set; }
 
+    public DbSet<WatcherPostModule> watcherPosts { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<GuildModule>()
@@ -22,7 +24,13 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<UserModule>()
             .HasKey(e => e.userID);
+
         modelBuilder.Entity<BlocklistModule>()
             .HasKey(e => e.blockTag);
+        modelBuilder.Entity<GuildBlockListModule>()
+            .HasKey(e => e.blockTag);
+
+        modelBuilder.Entity<WatcherPostModule>()
+            .HasKey(e => e.channelID);
     }
 }

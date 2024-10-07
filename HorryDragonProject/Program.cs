@@ -33,7 +33,8 @@ namespace HorryDragonProject {
                 }
             );
             builder.Services.AddSingleton<DragonDataBase>();
-
+            builder.Services.AddSingleton<DataBlocklist>();
+            
             builder.Services.AddSingleton<LogHandler>();
             builder.Services.AddSingleton<E621api>();
             builder.Services.AddSingleton<E621blocklist>();
