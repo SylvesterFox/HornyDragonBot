@@ -5,35 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonData;
 
-public class DataBlocklist
+public class DataBlocklist : DataServer
 {
-    private readonly IDbContextFactory<DatabaseContext>_contextFactory;
-    
-    public DataBlocklist(IDbContextFactory<DatabaseContext> dbContext)
+    public readonly IDbContextFactory<DatabaseContext> _contextFactory;
+    public DataBlocklist(IDbContextFactory<DatabaseContext> context) : base(context)
     {
-        _contextFactory = dbContext;
+        _contextFactory = context;
     }
-
-
-     private async Task<GuildModule> GetAndCreateGuild(SocketGuild Guild, IQueryable<GuildModule> guildModules)
-     {
-        GuildModule itemGuild;
-        using var context = _contextFactory.CreateDbContext();
-
-        if (await guildModules.AnyAsync() == false) {
-            itemGuild = new GuildModule{
-                guildID = Guild.Id,
-                guildName = Guild.Name
-            };
-            context.Add(itemGuild);
-            await context.SaveChangesAsync();
-        } else {
-            itemGuild = await guildModules.FirstAsync();
-        }
-            
-        return itemGuild;
-     }
-
 
     public async Task<UserModule> GetAndCreateUser(SocketUser user, IQueryable<UserModule> query) {
         UserModule itemUser;
@@ -49,7 +27,6 @@ public class DataBlocklist
         } else {
             itemUser = await query.FirstAsync();
         }
-
 
         return itemUser;
     }
@@ -71,12 +48,15 @@ public class DataBlocklist
     }
 
     public async Task GenerateSettingsDefaultForGuild(SocketGuild guild, List<string> bloclkistDefault) {
-        using var context = _contextFactory.CreateDbContext();
-        var query = context.Guilds.Where(x => x.guildID == guild.Id );
-        foreach (var itemTagName in bloclkistDefault) {
-            await SetBlocklistForGuild(guild, itemTagName, query);
+       
+        if (await DataCheckGuild(guild.Id) != true)
+        {
+            foreach (var itemTagName in bloclkistDefault)
+            {
+                await SetBlocklistForGuild(guild, itemTagName);
+            }
         }
-
+       
     }
 
     public async Task AddBlocklist(SocketUser user, string tag) {
@@ -88,7 +68,7 @@ public class DataBlocklist
     public async Task AddBlocklistForGuild(SocketGuild guild, string tag) {
         using var context = _contextFactory.CreateDbContext();
         var query = context.Guilds.Where(x => x.guildID == guild.Id);
-        await SetBlocklistForGuild(guild, tag, query);
+        await SetBlocklistForGuild(guild, tag);
     }
 
     private async Task SetBlocklist(SocketUser user, string blockTag, IQueryable<UserModule> queryUser) {
@@ -123,11 +103,11 @@ public class DataBlocklist
         return;
     }
 
-    private async Task SetBlocklistForGuild(SocketGuild guild, string block, IQueryable<GuildModule> queryGuild) {
+    private async Task SetBlocklistForGuild(SocketGuild guild, string block) {
         using var context = _contextFactory.CreateDbContext();
         GuildBlockListModule blockList;
 
-        GuildModule guildDB = await GetAndCreateGuild(guild, queryGuild);
+        GuildModule guildDB = await GetAndCreateGuild(guild);
         var query = context.GuildBlockLists.Where(x => x.blockTag == block).Where(x => x.guildID == guild.Id);
         
         if (await query.AnyAsync() == false) {

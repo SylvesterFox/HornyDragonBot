@@ -11,4 +11,5 @@ public class WatcherPostModule
     public ulong guildID { get; set; }
     public GuildModule guild { get; set; }
     public string watchTags { get; set; }
+    public bool posting { get; set; } = true;
 }
