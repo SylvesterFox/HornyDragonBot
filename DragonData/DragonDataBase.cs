@@ -1,31 +1,32 @@
-using Discord.WebSocket;
+using DragonData.Base;
 using DragonData.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace DragonData;
 
-public class DragonDataBase : DataServer
+public class DragonDataBase
 {
-    private readonly IDbContextFactory<DatabaseContext>_contextFactory;
+
+    public DataGuild dataGuild { get; set; }
     public DataBlocklist blocklist { get; set; }
     public DataWatcher watchlist { get; set; }
+    public DataUser dataUser { get; set; }
 
-    public DragonDataBase(IDbContextFactory<DatabaseContext> dbContext, DataBlocklist dataBlocklist, DataWatcher watchlist) : base(dbContext)
+    public DragonDataBase(IDbContextFactory<DatabaseContext> dbContext, 
+        DataBlocklist dataBlocklist, 
+        DataWatcher dataWatchlist,
+        DataGuild guildData,
+        DataUser userData)
     {
-        _contextFactory = dbContext;
         blocklist = dataBlocklist;
-        this.watchlist = watchlist;
-    }
-
-    public async Task AddWatcher(SocketGuild guild, SocketChannel channel, string tag)
-    {
-        using var context = _contextFactory.CreateDbContext();
-        var query = context.Guilds.Where(x => x.guildID == guild.Id);
-        if (await query.AnyAsync() != false) {
-            await watchlist.CreateWatcher(channel, query, tag);
-        }
+        watchlist = dataWatchlist;
+        dataGuild = guildData;
+        dataUser = userData;
     }
 
 
 
+   
+
+    
 }

@@ -18,7 +18,6 @@ public class E621Module : BaseModule
     public DragonDataBase dragonDataBase { private get; set; }
     public E621api api { private get; set; }
 
-    public E621blocklist blocklist { private get; set; }
 
     public E621Module(ILoggerFactory log) : base(log)
     {
@@ -31,7 +30,6 @@ public class E621Module : BaseModule
         [Summary("hide"), Autocomplete(typeof(ephemeralView))] bool hide = false) {
         await DeferAsync(ephemeral: hide);
 
-        await blocklist.UseBlocklist(Context.User);
         await api.GetAllResponse(tag, type: type, user: Context.User);
         
         if (api.Response.Count != 0) {
@@ -100,7 +98,7 @@ public class E621Module : BaseModule
     [SlashCommand("get-guild-blocklist", " Get list blocklist-tag for guild")]
     public async Task GetGuildBlocklistCmd() {
         await DeferAsync();
-        var list = dragonDataBase.blocklist.GetGuildBlockList(Context.Guild);
+        var list = dragonDataBase.blocklist.GetGuildBlockList(Context.Guild.Id);
         string text = "";
         text += string.Join(" ", list.Select(x => "-" + x.blockTag));
 
@@ -112,7 +110,7 @@ public class E621Module : BaseModule
     [SlashCommand("get-blocklist", "Get list blocklist-tag for guild")]
     public async Task GetBlocklistCmd() {
         await DeferAsync();
-        var list = dragonDataBase.blocklist.GetBlocklists(Context.User);
+        var list = dragonDataBase.blocklist.GetBlocklists(Context.User.Id);
         string text = "";
         text += string.Join(" ", list.Select(x => "-" + x.blockTag));
   

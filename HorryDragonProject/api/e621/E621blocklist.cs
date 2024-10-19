@@ -1,40 +1,49 @@
 ﻿using Discord.WebSocket;
 using DragonData;
-using Microsoft.Extensions.DependencyInjection;
+using DragonData.Module;
 
 namespace HorryDragonProject.api.e621
 {
     public class E621blocklist
     {
-        private E621api _api;
-        private DragonDataBase _dragonDataBase;
+        private DragonDataBase _dragonDataBase {  get; set; }
+        private Dictionary<ulong, string> _blockTagUser = new Dictionary<ulong, string>();
 
-        private List<string> _globalBlockList = new List<string>() { "gore", "scat", "watersports", "loli", "shota", "my_little_pony", "young", "fart" };
-
-        public E621blocklist(IServiceProvider service)
+        public E621blocklist(IServiceProvider service, DragonDataBase dragonData)
         {
-            _api = service.GetRequiredService<E621api>();
-            _dragonDataBase = service.GetRequiredService<DragonDataBase>();
+            _dragonDataBase = dragonData;
         }
 
-        public async Task UseBlocklist(SocketUser user, bool ignore = true)
+        public async Task<Dictionary<ulong, string>?> UseBlocklistUser(SocketUser? user, bool ignore = true)
         {
-            await _dragonDataBase.blocklist.GenerateSettingsDefaultForUser(user, _globalBlockList);;
-            if (ignore == true)
+            if (user == null)
             {
-                var list = _dragonDataBase.blocklist.GetBlocklists(user);
+                return null;
+            }
+
+            UserModule userItem = await _dragonDataBase.dataUser.GetAndCreateDataUser(user);
+            if (ignore != true)
+            {
+                var list = _dragonDataBase.blocklist.GetBlocklists(userItem.userID);
                 string urlblocklist = string.Join(" ", list.Select(x => "-" + x.blockTag));
 
-                if (_api.BlockTag.ContainsKey(user.Id) == false) {
-                    _api.BlockTag.Add(user.Id, urlblocklist);
-                } else {
-                    _api.BlockTag[user.Id] = urlblocklist;
+                if (_blockTagUser.ContainsKey(user.Id) == false)
+                {
+                    _blockTagUser.Add(user.Id, urlblocklist);
                 }
+                else
+                {
+                    _blockTagUser[user.Id] = urlblocklist;
+                }
+
+                return _blockTagUser;
             }
+
+            return null;
         }
 
-        public async Task UseBlocklistForGuild(SocketGuild guild, bool ignore = true) {
-            await _dragonDataBase.blocklist.GenerateSettingsDefaultForGuild(guild, _globalBlockList);
-        }
+        /* public async Task UseBlocklistForGuild(SocketGuild guild, bool ignore = true) {
+             await _dragonDataBase.blocklist.GenerateSettingsDefaultForGuild(guild, _globalBlockList);
+         }*/
     }
 }

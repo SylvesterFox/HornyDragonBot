@@ -1,5 +1,6 @@
 using Discord.WebSocket;
 using HorryDragonProject.Settings;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using System.Text.Json;
@@ -20,23 +21,25 @@ namespace HorryDragonProject.api.e621{
         private string types { get; set; } = string.Empty;
         public List<Post> Response { get; set; }
 
-        public Dictionary<ulong, string> BlockTag = new Dictionary<ulong, string>();
+        private E621blocklist _blocklist { get; set; }
 
-        public E621api(ILogger<E621api> logger)
+        public E621api(ILogger<E621api> logger, IServiceProvider service)
         {
             _botConfig = BotSettingInit.Instance.LoadedConfig;
             _token = _botConfig.TOKEN_E621;
             _user = _botConfig.USER_E621;
             _address = $"https://e621.net/posts.json";
             _logger = logger;
+            _blocklist = service.GetRequiredService<E621blocklist>();
         }
 
-        private async Task<string> _RequsetApi(string uri, string tag, bool random, SocketUser? socketUser, SocketGuild? socketGuild)
+        private async Task<string> _RequsetApi(string uri, string tag, bool random, bool ignoreBlocklist, SocketUser? socketUser, SocketGuild? socketGuild)
         {
             try
             {
 
                 var requrst = new RestRequest(uri, Method.Get);
+                var blocklistUser = await _blocklist.UseBlocklistUser(user: socketUser, ignore: ignoreBlocklist);
 
                 if (random)
                 {
@@ -46,15 +49,20 @@ namespace HorryDragonProject.api.e621{
                     tag += $" {types} rating:{reating}";
                 }
 
-                if (socketUser != null && BlockTag.Count != 0)
+                if (socketUser != null && blocklistUser != null) {
+                    tag += blocklistUser[socketUser.Id];
+                    _logger.LogDebug($"Blocklist {blocklistUser[socketUser.Id]}");
+                }
+
+              /*  if (socketUser != null && BlockTag.Count != 0)
                 {
-                    tag += BlockTag[socketUser.Id];
+                    tag += E621blocklist.BlockTag[socketUser.Id];
                     _logger.LogDebug($"Blocklist {BlockTag[socketUser.Id]}");
                 } else if (socketGuild != null && BlockTag.Count != 0) {
                     tag += BlockTag[socketGuild.Id];
                     _logger.LogDebug($"Blocklist {BlockTag[socketGuild.Id]}");
                 }
-
+*/
                 requrst.AddParameter("tags", tag);
                 requrst.AddParameter("limit", _limit);
                 requrst.AddParameter("page", _requrstPage);
@@ -83,7 +91,7 @@ namespace HorryDragonProject.api.e621{
 
         public async Task<Post?> GetPost(string tags, SocketUser? user = null, SocketGuild? guild = null) {
 
-            var _response = await _RequsetApi(_address, tags, false, user, guild);
+            var _response = await _RequsetApi(_address, tags, false, false, user, guild);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
             if (deserializedResponse != null)
@@ -99,16 +107,17 @@ namespace HorryDragonProject.api.e621{
 
 
 
-        public async Task GetAllResponse(string tags, 
-        int linit = 320, 
-        string? type = "",  
-        bool random = true, 
+        public async Task GetAllResponse(string tags,
+        int linit = 320,
+        string? type = "",
+        bool random = true,
+        bool ignoreBlocklist = false,
         SocketUser? user = null, SocketGuild? guild = null)
         {
             _limit = linit;
 
             if (type != "type:webm") {
-                types = type + " -type:webm";
+                types = type + " -type:webm -type:swf";
             } else {
                 types = type;
             }
@@ -118,7 +127,7 @@ namespace HorryDragonProject.api.e621{
                 _limit = 320;
             }
 
-            var _response = await _RequsetApi(_address, tags, random, user, guild);
+            var _response = await _RequsetApi(_address, tags, random, ignoreBlocklist, user, guild);
 
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 

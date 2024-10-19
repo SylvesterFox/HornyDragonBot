@@ -9,9 +9,11 @@ using Microsoft.Extensions.Logging;
 using DragonData.Context;
 using Microsoft.EntityFrameworkCore;
 using DragonData;
+using DragonData.Base;
 
 
-namespace HorryDragonProject {
+namespace HorryDragonProject
+{
     internal class Program()
     {
         
@@ -34,7 +36,11 @@ namespace HorryDragonProject {
             );
             builder.Services.AddSingleton<DragonDataBase>();
             builder.Services.AddSingleton<DataBlocklist>();
-            
+            builder.Services.AddSingleton<DataWatcher>();
+            builder.Services.AddSingleton<DataUser>();
+            builder.Services.AddSingleton<DataGuild>();
+
+
             builder.Services.AddSingleton<LogHandler>();
             builder.Services.AddSingleton<E621api>();
             builder.Services.AddSingleton<E621blocklist>();
