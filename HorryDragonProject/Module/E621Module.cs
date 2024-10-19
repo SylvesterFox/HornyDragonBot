@@ -18,12 +18,11 @@ public class E621Module : BaseModule
     public DragonDataBase dragonDataBase { private get; set; }
     public E621api api { private get; set; }
 
-
     public E621Module(ILoggerFactory log) : base(log)
     {
     }
 
-   
+  
     [SlashCommand("search", "Post viewer")]
     public async Task SearchCmd(string tag, 
         [Summary("type"), Autocomplete(typeof(E621typeAutocomplete))] string? type = null, 
@@ -58,27 +57,6 @@ public class E621Module : BaseModule
 
     }
 
-    [SlashCommand("start", "test start")]
-    public async Task StartCmd()
-    {
-        var tagQueries = new List<string>
-        {
-            "dragon",
-            "wolf",
-            "knot"
-        };
-        watcherPost.TagQueries(tagQueries);
-        watcherPost.StartWatchig(TimeSpan.FromMilliseconds(300000));
-        await RespondAsync("start autoposting..");
-    }
-
-    [SlashCommand("stop", "test stop")]
-    public async Task StopCmd()
-    {
-        watcherPost.StopWatchig();
-        await RespondAsync("stop autoposting..");
-
-    }
 
     [SlashCommand("add-blocklist-for-guild", "Add blocklist tag for guild")]
     public async Task GuildBlockListAddCmd(string tag) {

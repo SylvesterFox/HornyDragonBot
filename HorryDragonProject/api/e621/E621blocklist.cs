@@ -8,13 +8,14 @@ namespace HorryDragonProject.api.e621
     {
         private DragonDataBase _dragonDataBase {  get; set; }
         private Dictionary<ulong, string> _blockTagUser = new Dictionary<ulong, string>();
+        private Dictionary<ulong, string> _blockTagGuild = new Dictionary<ulong, string>();
 
         public E621blocklist(IServiceProvider service, DragonDataBase dragonData)
         {
             _dragonDataBase = dragonData;
         }
 
-        public async Task<Dictionary<ulong, string>?> UseBlocklistUser(SocketUser? user, bool ignore = true)
+        public async Task<Dictionary<ulong, string>?> UseBlocklistUser(SocketUser? user, bool ignore = false)
         {
             if (user == null)
             {
@@ -40,6 +41,34 @@ namespace HorryDragonProject.api.e621
             }
 
             return null;
+        }
+
+        public async Task<Dictionary<ulong, string>?> UseBlocklistGuild(SocketGuild? guild, bool ignore = false)
+        {
+            if (guild == null)
+            {
+                return null;
+            }
+
+            GuildModule guildItem = await _dragonDataBase.dataGuild.GetAndCreateDataGuild(guild);
+            if (ignore != true)
+            {
+                var list = _dragonDataBase.blocklist.GetGuildBlockList(guildItem.guildID);
+                string urlblocklist = string.Join(" ", list.Select(_ => "-" + _.blockTag));
+
+                if (_blockTagGuild.ContainsKey(guild.Id) == false)
+                {
+                    _blockTagGuild.Add(guild.Id, urlblocklist);
+                }
+                else
+                {
+                    _blockTagGuild[guild.Id] = urlblocklist;
+                }
+
+                return _blockTagGuild;
+            }
+
+           return null;
         }
 
         /* public async Task UseBlocklistForGuild(SocketGuild guild, bool ignore = true) {

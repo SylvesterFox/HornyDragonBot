@@ -40,6 +40,7 @@ namespace HorryDragonProject.api.e621{
 
                 var requrst = new RestRequest(uri, Method.Get);
                 var blocklistUser = await _blocklist.UseBlocklistUser(user: socketUser, ignore: ignoreBlocklist);
+                var blocklistGuild = await _blocklist.UseBlocklistGuild(guild: socketGuild, ignore: ignoreBlocklist);
 
                 if (random)
                 {
@@ -52,17 +53,11 @@ namespace HorryDragonProject.api.e621{
                 if (socketUser != null && blocklistUser != null) {
                     tag += blocklistUser[socketUser.Id];
                     _logger.LogDebug($"Blocklist {blocklistUser[socketUser.Id]}");
+                } else if (socketGuild != null && blocklistGuild != null) {
+                    tag += blocklistGuild[socketGuild.Id];
+                    _logger.LogDebug($"Blocklist {blocklistGuild[socketGuild.Id]}");
                 }
 
-              /*  if (socketUser != null && BlockTag.Count != 0)
-                {
-                    tag += E621blocklist.BlockTag[socketUser.Id];
-                    _logger.LogDebug($"Blocklist {BlockTag[socketUser.Id]}");
-                } else if (socketGuild != null && BlockTag.Count != 0) {
-                    tag += BlockTag[socketGuild.Id];
-                    _logger.LogDebug($"Blocklist {BlockTag[socketGuild.Id]}");
-                }
-*/
                 requrst.AddParameter("tags", tag);
                 requrst.AddParameter("limit", _limit);
                 requrst.AddParameter("page", _requrstPage);

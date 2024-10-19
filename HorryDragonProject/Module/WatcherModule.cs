@@ -8,6 +8,34 @@ using Microsoft.Extensions.Logging;
 
 namespace HorryDragonProject.Module
 {
+    public interface IQueries
+    {
+        ulong channelId { get; set; }
+        SocketGuild guild { get; set; }
+        string Tag { get; set; }
+        TimeSpan interval { get; set; }
+    }
+
+    public class Queries : IQueries
+    {
+        private ulong _channelId;
+        public ulong channelId { get => _channelId; set => _channelId = value; }
+
+        private string _tag;
+        public string Tag 
+        {                   
+            get => _tag; 
+            set => _tag = value; 
+        }
+
+        private TimeSpan _interval;
+        public TimeSpan interval { get => _interval; set => _interval = value;}
+
+        private SocketGuild _guild;
+        public SocketGuild guild { get => _guild; set => _guild = value; }
+    }
+
+
     [Group("e621watcher", "E621 Watcher cmd")]
     public class WatcherModule : BaseModule
     {
@@ -46,10 +74,43 @@ namespace HorryDragonProject.Module
 
 
             await FollowupAsync($"Autoposting is create: #{tag}");
-
-
             
+        }
 
-        }    
+        [SlashCommand("start", "test start")]
+        public async Task StartCmd()
+        {
+
+            List<Queries> queries = new List<Queries>
+            {
+                new Queries {
+                    channelId = Context.Channel.Id,
+                    Tag = "knot",
+                    interval = TimeSpan.FromMinutes(1),
+                    guild = Context.Guild,
+                },
+                new Queries { 
+                    channelId = 1297187632605954108, 
+                    Tag = "dragon",
+                    interval = TimeSpan.FromMinutes(1),
+                    guild = Context.Guild,
+                }
+            };
+
+            watcherPost.TagQueries(queries);
+            watcherPost.StartWatchigAll();
+            await RespondAsync("start autoposting..");
+        }
+
+        [SlashCommand("stop", "test stop")]
+        public async Task StopCmd()
+        {
+            watcherPost.StopWatchig(Context.Channel.Id);
+            await RespondAsync("stop autoposting..");
+
+        }
+
     }
+    
+    
 }
