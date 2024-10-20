@@ -37,10 +37,10 @@ namespace DragonData.Base
 
         }
 
-        public async Task InteravalUpdate(SocketChannel channel, int interval)
+        public async Task InteravalUpdate(ulong channelId, int interval)
         {
             using var context = contextFactoryData.CreateDbContext();
-            var intervalData = await context.watcherPosts.Where(x => x.channelID == channel.Id).FirstOrDefaultAsync();
+            var intervalData = await context.watcherPosts.Where(x => x.channelID == channelId).FirstOrDefaultAsync();
             if (intervalData != null)
             {
                 intervalData.interval = interval;
@@ -51,28 +51,32 @@ namespace DragonData.Base
            
         }
 
-        public async Task PauseUpdate(SocketChannel channel, bool pause)
+        public async Task<bool?> UpdateActiveQueries(SocketChannel channel)
         {
             using var context = contextFactoryData.CreateDbContext();
             var pauseData = await context.watcherPosts.Where(x => x.channelID == channel.Id).FirstOrDefaultAsync();
-            if (pauseData != null) { 
-                pauseData.pause = pause;
-                await context.SaveChangesAsync();
-            }
-            return;
-        }
 
-        public async Task<bool> GetPause(SocketChannel channel)
-        {
-            using var context = contextFactoryData.CreateDbContext();
-            var pauseData = await context.watcherPosts.Where(x => x.channelID == channel.Id).FirstOrDefaultAsync();
-            if (pauseData != null)
+            if (pauseData == null)
             {
-                return pauseData.pause;
+                return null;
             }
 
-            return false;
+            switch (pauseData.pause)
+            {
+                case false:
+                    pauseData.pause = true;
+                    await context.SaveChangesAsync();
+                    break;
+                case true:
+                    pauseData.pause = false;
+                    await context.SaveChangesAsync();
+                    break;
+            }
+
+            return pauseData.pause;
         }
+
+
 
         public async Task<List<WatcherPostModule>?> GetAllWatcher(SocketGuild guild)
         {
@@ -89,8 +93,19 @@ namespace DragonData.Base
         public async Task<List<WatcherPostModule>> GetActiveQueriesAsync()
         {
             using var context = contextFactoryData.CreateDbContext();
-            return await context.watcherPosts.Where(x => x.pause).ToListAsync();
-                
+            return await context.watcherPosts.Where(x => x.pause).ToListAsync();    
+        }
+
+        public async Task<bool> DeleteQueryAsync(ulong channelId)
+        {
+            using var context = contextFactoryData.CreateDbContext();
+            var query = await context.watcherPosts.Where(x => x.channelID == channelId).FirstOrDefaultAsync();
+            if (query != null) {
+                context.Remove(query);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
     }

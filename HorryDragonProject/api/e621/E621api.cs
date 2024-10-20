@@ -97,7 +97,7 @@ namespace HorryDragonProject.api.e621{
                 }
             }
 
-            throw new NullReferenceException($"Response is null!");
+            return null;
         }
 
 

@@ -4,32 +4,31 @@ using DragonData;
 using DragonData.Module;
 using HorryDragonProject.api.e621;
 using HorryDragonProject.Custom;
-using HorryDragonProject.Module;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace HorryDragonProject.Service
 {
+
     public class ServiceWatcherPost
     {
         private readonly List<QueryData> _queries;
-        private Dictionary<ulong, Timer> _timers;
+        private Dictionary<ulong, TimerInfo> _timers;
         private SocketTextChannel _textChannel;
         private readonly DiscordSocketClient _client;
         public readonly ILogger _logger;
         private ConcurrentQueue<QueryData> _queriesQueue;
         private bool _isProcessing;
+
         public E621api api { private get; set; }
         public DragonDataBase dragonDataBase { private get; set; }
 
         public ServiceWatcherPost(DiscordSocketClient client, ILogger<ServiceWatcherPost> logger, IServiceProvider service)
         {
             _queries = new List<QueryData>();
-            _timers = new Dictionary<ulong, Timer>();
+            _timers = new Dictionary<ulong, TimerInfo>();
             _queriesQueue = new ConcurrentQueue<QueryData>();
             api = service.GetRequiredService<E621api>();
             dragonDataBase = service.GetRequiredService<DragonDataBase>();
@@ -46,14 +45,6 @@ namespace HorryDragonProject.Service
                 StartTimerForQuery(query);
             }
 
-            /*foreach (var queryData in _queries) {
-               var timer = new Timer(_ =>
-               {
-                   QueueQuery(queryData);
-                   _logger.LogDebug($"Watchig response: {queryData.Tags}");
-               }, null, TimeSpan.Zero, queryData.Interval);
-                _timers[queryData.channelId] = timer;
-            }*/
 
             var dbCheckTimer = new Timer(async _ => await UpdateQueriesFromDatabase(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
@@ -66,8 +57,23 @@ namespace HorryDragonProject.Service
 
             foreach(var query in dbQueries)
             {
-                if (!_timers.ContainsKey(query.channelID))
+                if (_timers.ContainsKey(query.channelID))
                 {
+
+                    var existingQueryData = _timers[query.channelID];
+
+                    if (existingQueryData.Interval != query.interval)
+                    {
+                        _logger.LogInformation($"[DB Update] Updating interval for query ID {query.channelID}");
+
+                        StopWatchig(query.channelID);
+
+                        StartTimerForQuery(query);
+                    }
+
+                } else
+                {
+                    _logger.LogInformation($"[DB Update] Adding new query with ID {query.channelID}");
                     StartTimerForQuery(query);
                 }
             }
@@ -77,6 +83,7 @@ namespace HorryDragonProject.Service
             {
                 if (!activeQueryIds.Contains(existingTimerId))
                 {
+                    _logger.LogInformation($"[DB Update] Stopping query with ID {existingTimerId}");
                     StopWatchig(existingTimerId);
                 }
             }
@@ -96,8 +103,11 @@ namespace HorryDragonProject.Service
                     guild = guild,
                 };
 
-                var timer = new Timer(_ => QueueQuery(queryData), null, TimeSpan.Zero, queryData.Interval);
-                _timers[query.channelID] = timer;
+                var timer = new Timer(_ =>
+                {
+                    QueueQuery(queryData);
+                }, null, TimeSpan.Zero, queryData.Interval);
+                _timers[query.channelID] = new TimerInfo { Timer = timer, Interval = query.interval};
             }
         }
 
@@ -124,45 +134,20 @@ namespace HorryDragonProject.Service
             _queriesQueue.Enqueue(queryData);
         }
 
-        public void StopWatchig(ulong channelId) {
+        private void StopWatchig(ulong channelId) {
             
             if (_timers.ContainsKey(channelId))
             {
-                _timers[channelId].Change(Timeout.Infinite, 0);
+                _timers[channelId].Timer.Change(Timeout.Infinite, 0);
                 _timers.Remove(channelId);
             }
         }
 
-/*        public void AddTagQueries(Queries query)
-        {
-            _queries.Add(new QueryData
-            {
-                Tags = query.Tag,
-                LastPostIds = new HashSet<int>(),
-                Interval = query.interval,
-                channelId = query.channelId,
-                guild = query.guild
-            });
-        }
-
-        public void DataTagQueries(List<WatcherPostModule> watchers)
-        {
-            foreach (var watcher in watchers)
-            {
-                var guild = _client.GetGuild(watcher.guildID);
-                _queries.Add(new QueryData
-                {
-                    Tags = watcher.watchTags,
-                    LastPostIds = new HashSet<int>(),
-                    Interval = TimeSpan.FromMilliseconds(watcher.interval),
-                    guild = guild,
-                });
-            }
-        }*/
 
         private async Task CheckForNewPost(QueryData queryData)
         {
             var tag = queryData.Tags;
+            _logger.LogDebug($"The tracker executes a request with the tag: {queryData.Tags} For the guild: {queryData.guild.Name}:");
             try
             {
                 SocketTextChannel _textChannel = (SocketTextChannel)_client.GetChannel(queryData.channelId);
@@ -189,7 +174,7 @@ namespace HorryDragonProject.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogCritical(ex.Message);
             }
             
         }
@@ -203,6 +188,11 @@ namespace HorryDragonProject.Service
             public SocketGuild guild { get; set; }
         }
 
-      
+        private class TimerInfo
+        {
+            public Timer Timer { get; set; }
+            public int Interval { get; set; }
+        }
+
     }
 }

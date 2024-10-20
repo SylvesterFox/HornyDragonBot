@@ -13,11 +13,7 @@ namespace DragonData.Base
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <returns></returns>
+
         public async Task<bool> DataCheckUser(ulong ID)
         {
             using var context = contextFactoryData.CreateDbContext();
