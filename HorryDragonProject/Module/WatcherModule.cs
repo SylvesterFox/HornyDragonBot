@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HorryDragonProject.Module
 {
-    public interface IQueries
+/*    public interface IQueries
     {
         ulong channelId { get; set; }
         SocketGuild guild { get; set; }
@@ -33,7 +33,7 @@ namespace HorryDragonProject.Module
 
         private SocketGuild _guild;
         public SocketGuild guild { get => _guild; set => _guild = value; }
-    }
+    }*/
 
 
     [Group("e621watcher", "E621 Watcher cmd")]
@@ -70,6 +70,7 @@ namespace HorryDragonProject.Module
 
                 SocketChannel socketchannel = Context.Guild.GetChannel(channel.Id);
                 await dragonDataBase.watchlist.AddWatcher(Context.Guild, socketchannel, tag);
+
             }
 
 
@@ -77,30 +78,6 @@ namespace HorryDragonProject.Module
             
         }
 
-        [SlashCommand("start", "test start")]
-        public async Task StartCmd()
-        {
-
-            List<Queries> queries = new List<Queries>
-            {
-                new Queries {
-                    channelId = Context.Channel.Id,
-                    Tag = "knot",
-                    interval = TimeSpan.FromMinutes(1),
-                    guild = Context.Guild,
-                },
-                new Queries { 
-                    channelId = 1297187632605954108, 
-                    Tag = "dragon",
-                    interval = TimeSpan.FromMinutes(1),
-                    guild = Context.Guild,
-                }
-            };
-
-            watcherPost.TagQueries(queries);
-            watcherPost.StartWatchigAll();
-            await RespondAsync("start autoposting..");
-        }
 
         [SlashCommand("stop", "test stop")]
         public async Task StopCmd()

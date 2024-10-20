@@ -1,4 +1,4 @@
-using Discord;
+
 using Discord.WebSocket;
 using DragonData.Context;
 using DragonData.Module;
@@ -9,7 +9,7 @@ namespace DragonData.Base;
 
 public class DataBlocklist : DataBase
 {
-    public static List<string> _globalBlockList = new List<string>() { "gore", "scat", "watersports", "loli", "shota", "my_little_pony", "young", "fart" };
+    public static List<string> _globalBlockList = new List<string>() { "gore", "scat", "watersports", "loli", "shota", "my_little_pony", "young", "fart", "intersex", "humanoid" };
 
 
     public DataBlocklist(IDbContextFactory<DatabaseContext> context) : base(context)

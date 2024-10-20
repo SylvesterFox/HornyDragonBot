@@ -82,7 +82,10 @@ namespace DragonData.Migrations
                     b.Property<ulong>("guildID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("posting")
+                    b.Property<int>("interval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("pause")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("watchTags")

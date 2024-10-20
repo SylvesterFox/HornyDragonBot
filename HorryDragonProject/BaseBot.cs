@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using DragonData.Context;
 using HorryDragonProject.Handlers;
+using HorryDragonProject.Service;
 using HorryDragonProject.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +51,7 @@ namespace HorryDragonProject {
         {
             var context = _service.GetRequiredService<DatabaseContext>();
             var _sCommand = _service.GetRequiredService<InteractionService>();
+            var _watcher = _service.GetRequiredService<ServiceWatcherPost>();
             await _service.GetRequiredService<InteractionHandler>().InitInteraction();
              
             _client.Ready += async () => {
@@ -58,6 +60,7 @@ namespace HorryDragonProject {
                 Console.WriteLine("Starting rawr bot..");
                 Console.WriteLine($"Ver: {Assembly.GetEntryAssembly()?.GetName().Version} ");
                 await setupDatabaseTask(context);
+                await _watcher.StartWatchig();
             };
  
 

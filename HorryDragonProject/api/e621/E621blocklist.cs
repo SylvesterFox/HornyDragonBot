@@ -70,9 +70,5 @@ namespace HorryDragonProject.api.e621
 
            return null;
         }
-
-        /* public async Task UseBlocklistForGuild(SocketGuild guild, bool ignore = true) {
-             await _dragonDataBase.blocklist.GenerateSettingsDefaultForGuild(guild, _globalBlockList);
-         }*/
     }
 }
