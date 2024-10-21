@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using DragonData.Context;
 using DragonData.Module;
+using DragonData.Settings;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -9,8 +10,7 @@ namespace DragonData.Base;
 
 public class DataBlocklist : DataBase
 {
-    public static List<string> _globalBlockList = new List<string>() { "gore", "scat", "watersports", "loli", "shota", "my_little_pony", "young", "fart", "intersex", "humanoid" };
-
+    public static List<string> _globalBlockList = SettingsBlocklistDefault.GetJsonBlocklist();
 
     public DataBlocklist(IDbContextFactory<DatabaseContext> context) : base(context)
     {
@@ -62,7 +62,7 @@ public class DataBlocklist : DataBase
     public async Task DeleteTagFromBlocklist(SocketUser user, string blocktag)
     {
         using var context = contextFactoryData.CreateDbContext();
-        var query = context.blocklists.Where(x => x.userID == user.Id).Where(x => x.blockTag == blocktag).FirstOrDefault();
+        var query = await context.blocklists.Where(x => x.userID == user.Id).Where(x => x.blockTag == blocktag).FirstOrDefaultAsync();
         if (query != null)
         {
             context.Remove(query);
@@ -70,6 +70,19 @@ public class DataBlocklist : DataBase
         }
         return;
     }
+
+    public async Task GuildDeleteTagFromBlocklist(SocketGuild guild, string blocktag)
+    {
+        using var context = contextFactoryData.CreateDbContext();
+        var query = await context.GuildBlockLists.Where(x => x.guildID == guild.Id).Where(x => x.blockTag == blocktag).FirstOrDefaultAsync();
+        if (query != null)
+        {
+            context.Remove(query);
+            await context.SaveChangesAsync();
+        }
+        return;
+    }
+
 
     public async Task SetBlocklistForGuild(SocketGuild guild, GuildModule guildModule, string block)
     {
@@ -94,17 +107,20 @@ public class DataBlocklist : DataBase
     }
 
 
-    public List<GuildBlockListModule> GetGuildBlockList(ulong guildId)
+    public async Task<List<GuildBlockListModule>> GetGuildBlockList(SocketGuild guild)
     {
-
+        var _guild = new DataGuild(contextFactoryData);
+        GuildModule dataGuild = await _guild.GetAndCreateDataGuild(guild);
         using var context = contextFactoryData.CreateDbContext();
-        return context.GuildBlockLists.Where(x => x.guildID == guildId).ToList();
+        return context.GuildBlockLists.Where(x => x.guildID == dataGuild.guildID).ToList();
     }
 
-    public List<BlocklistModule> GetBlocklists(ulong userId)
+    public async Task<List<BlocklistModule>> GetBlocklist(SocketUser user)
     {
+        var _user = new DataUser(contextFactoryData);
+        UserModule dataUser = await _user.GetAndCreateDataUser(user);
         using var context = contextFactoryData.CreateDbContext();
-        return context.blocklists.Where(x => x.userID == userId).ToList();
+        return context.blocklists.Where(x => x.userID == dataUser.userID).ToList();
     }
 
 

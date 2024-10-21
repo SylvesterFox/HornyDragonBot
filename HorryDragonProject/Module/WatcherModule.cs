@@ -1,8 +1,10 @@
 ﻿
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DragonData;
 using HorryDragonProject.api.e621;
+using HorryDragonProject.Custom;
 using HorryDragonProject.Service;
 using Microsoft.Extensions.Logging;
 
@@ -22,20 +24,36 @@ namespace HorryDragonProject.Module
         [SlashCommand("create", "Creates a channel in which art from e621 will be automatically posted using the required tags")]
         public async Task CreateWatcherCmd(string tag)
         {
-            await DeferAsync();
-            var category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Name == "HorryDragonBot");
-            var tagCheck = await api.GetPost(tag, guild: Context.Guild);
+            await DeferAsync(ephemeral: true);
+            SocketCategoryChannel? category = null;
 
-            if (tagCheck == null)
+            var tagCheck = await api.GetPost(tag, guild: Context.Guild);
+            if (await blocklist.CheckTagBlocklistForGuild(Context.Guild, tag) == true)
             {
-                await FollowupAsync($"There are no posts in this tag {tag}");
+                var text = await blocklist.GetStringBlocklistForGuild(Context.Guild);
+                await FollowupAsync(embed: TemplateEmbeds.embedWarning($"It is impossible to create an autoposting with these tags, because one of the tags is in your blocklist:\n{Format.Code(text, "cs")}" +
+                    $"\nYou can delete it using the command **`/e621 delete-blocklist-guild`**", "Oups!"));
                 return;
             }
 
-            if (category == null)
+            if (tagCheck == null)
             {
-                await Context.Guild.CreateCategoryChannelAsync("HorryDragonBot");
-                category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Name == "HorryDragonBot");
+                await FollowupAsync(embed: TemplateEmbeds.embedWarning($"There are no posts in this tag {tag}", "The request was empty :("));
+                return;
+            }
+
+            var idCategory = await dragonDataBase.dataGuild.GetIdCategoty(Context.Guild);
+            if (idCategory != 0)
+            {
+                category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Id == idCategory);
+            } else
+            {
+                var nameCategory = await dragonDataBase.dataGuild.GetDefaultNameCategory(Context.Guild);
+                await Context.Guild.CreateCategoryChannelAsync(nameCategory);
+                category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Name == nameCategory);
+
+                if (category == null) return;
+                await dragonDataBase.dataGuild.SetIdCategory(category.Id, Context.Guild);
             }
 
             var channel = await Context.Guild.CreateTextChannelAsync(tag);
@@ -50,8 +68,7 @@ namespace HorryDragonProject.Module
 
                 SocketChannel socketchannel = Context.Guild.GetChannel(channel.Id);
                 await dragonDataBase.watchlist.AddWatcher(Context.Guild, socketchannel, tag);
-                await FollowupAsync($"Autoposting is create: <#{socketchannel.Id}>");
-
+                await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Autoposting is create: <#{socketchannel.Id}>", "Success!"));
             }
 
             
@@ -67,11 +84,11 @@ namespace HorryDragonProject.Module
             switch (pause)
             {
                 case false:
-                    await FollowupAsync($"Autoposting has been stopped: <#{channel.Id}>"); break;
+                    await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Autoposting has been stopped: <#{channel.Id}>", "Stopped!")); break;
                 case true:
-                    await FollowupAsync($"Autoposting has been restored: <#{channel.Id}>"); break;
+                    await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Autoposting has been restored: <#{channel.Id}>", "Restored")); break;
                 default:
-                    await FollowupAsync("This channel is not linked to auto-posting"); break;
+                    await FollowupAsync(embed: TemplateEmbeds.embedWarning("This channel is not linked to auto-posting", "Oups!")); break;
             }
 
         }
@@ -86,11 +103,11 @@ namespace HorryDragonProject.Module
 
             if (IsDel) {
                 await channelContext.DeleteAsync();
-                await FollowupAsync($"Was successfully deleted: #{channelContext.Name}");
+                await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Was successfully deleted: #{channelContext.Name}", "Sussess!"));
                 return;
             }
 
-            await FollowupAsync($"Failed to remove this {channelContext.Name}");
+            await FollowupAsync(embed: TemplateEmbeds.embedError($"Failed to remove this {channelContext.Name}"));
         }
 
 
@@ -101,11 +118,11 @@ namespace HorryDragonProject.Module
             if (interval > 1)
             {
                 await dragonDataBase.watchlist.InteravalUpdate(channel.Id, interval);
-                await FollowupAsync($"The interval for this posting <#{channel.Id}> has been changed to {interval} minutes");
+                await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"The interval for this posting <#{channel.Id}> has been changed to {interval} minutes", "Update interval!"));
                 return;
             }
 
-            await FollowupAsync("You can't put zero :(");
+            await FollowupAsync(embed: TemplateEmbeds.embedWarning("The minimum you can set is only 2 minutes!", "The interval was not updated!"));
         }
     }
     

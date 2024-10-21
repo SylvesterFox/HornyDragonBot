@@ -1,6 +1,4 @@
-﻿
-
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using DragonData.Context;
 using DragonData.Module;
 using Microsoft.EntityFrameworkCore;

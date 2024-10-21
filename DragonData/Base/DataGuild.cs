@@ -45,10 +45,10 @@ namespace DragonData.Base
         }
 
         /// <summary>
-        /// 
+        /// Returns specific guild data from the database
         /// </summary>
         /// <param name="guild"></param>
-        /// <returns></returns>
+        /// <returns>Return GuildModule</returns>
         private async Task<GuildModule> GetGuild(SocketGuild guild)
         {
             using var context = contextFactoryData.CreateDbContext();
@@ -74,6 +74,35 @@ namespace DragonData.Base
             }
             return dataGuild;
 
+        }
+
+        public async Task SetIdCategory(ulong IdCategory, SocketGuild guild)
+        {
+            using var context = contextFactoryData.CreateDbContext();
+            GuildModule dataGuild = await GetAndCreateDataGuild(guild);
+            var query = await context.Guilds.Where(xyu => xyu.guildID == dataGuild.guildID).FirstOrDefaultAsync();
+            if (query == null)
+            {
+              return;
+            }
+            
+            if (query.queryCatagoryId != IdCategory)
+            {
+                query.queryCatagoryId = IdCategory;
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<string> GetDefaultNameCategory(SocketGuild guild)
+        {
+            GuildModule dataGuild = await GetAndCreateDataGuild(guild);
+            return dataGuild.queryCategoryName;
+        }
+
+        public async Task<ulong> GetIdCategoty(SocketGuild guild)
+        {
+            GuildModule dataGuild = await GetAndCreateDataGuild(guild);
+            return dataGuild.queryCatagoryId;
         }
     }
 }

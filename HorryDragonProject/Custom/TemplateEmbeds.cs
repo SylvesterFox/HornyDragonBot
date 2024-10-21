@@ -3,6 +3,61 @@ using HorryDragonProject.api.e621;
 using HorryDragonProject.Service;
 
 namespace HorryDragonProject.Custom {
+    public class FormatPost
+    {
+        public static string GetSouces(List<string> Sources)
+        {
+            string text = "";
+            try
+            {
+                
+
+                foreach (string Source in Sources)
+                {
+                    if (Source == null)
+                    {
+                        return null;
+                    }
+
+                    Uri uri = new Uri(Source);
+                    string host = uri.Host;
+                    string path = uri.AbsolutePath;
+                    switch (host)
+                    {
+                        case "www.furaffinity.net":
+                            if (path.Contains("/user"))
+                            {
+                                text += $"[[Furaffinity Author]]({Source}) ";
+                                break;
+                            } else
+                            {
+                                text += $"[[Furaffinity]]({Source}) ";
+                                break;
+                            }     
+                        case "bsky.app":
+                            text += $"[[Bsky]]({Source}) ";
+                            break;
+                        case "x.com":
+                            text += $"[[Twitter]]({Source}) ";
+                            break;
+                        case "twitter.com":
+                            text += $"[[Twitter]]({Source}) ";
+                            break;
+                        
+                    }
+                }
+
+                return text;
+            } catch (Exception ex)
+            {
+                return text;
+            }
+           
+               
+        }
+     }
+    
+
     public class TemplateEmbeds
     {
         public static Color errorColor { get; } = Color.Red;
@@ -10,7 +65,7 @@ namespace HorryDragonProject.Custom {
         public static Color successColor { get; } = Color.Green;
         private static Color _e621Color { get; } = Color.Blue;
         public static string footerText { get; } = "Dragofox property :b";
-        public static string footerIco { get; } = "https://media.discordapp.net/attachments/896091932000927745/1250845431823335537/dragofox_new_pfp.png?ex=66c6bad6&is=66c56956&hm=2e27c45b3d14fdd21cc8cf9b899e9dc4f9d95b7e5ee8df72a4e56380243a3b1b&=&format=webp";
+        public static string footerIco { get; } = "https://avatars.githubusercontent.com/u/51517881?v=4";
 
         private static EmbedFooterBuilder _creatorName = new EmbedFooterBuilder() {
           Text = footerText,
@@ -56,11 +111,11 @@ namespace HorryDragonProject.Custom {
 
         public static EmbedBuilder PostEmbedTemplate(Post str, string tag)
         {
-
+            var souces = FormatPost.GetSouces(str.Sources);
             string description = $"## Search tags:```{tag}```\n";
             description += $"## Tags: ```{string.Join(", ", str.Tags.General.Take(25))}```\n\n";
-            description += $"[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})";
-
+            description += $"[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})\n";
+            description += $"## Sources:\n{souces}";
 
             EmbedBuilder postEmbed = new EmbedBuilder()
             {
