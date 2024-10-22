@@ -1,5 +1,3 @@
-
-
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 
