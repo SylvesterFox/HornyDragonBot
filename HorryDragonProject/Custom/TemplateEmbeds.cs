@@ -10,8 +10,6 @@ namespace HorryDragonProject.Custom {
             string text = "";
             try
             {
-                
-
                 foreach (string Source in Sources)
                 {
                     if (Source == null)
@@ -50,7 +48,7 @@ namespace HorryDragonProject.Custom {
                 return text;
             } catch (Exception ex)
             {
-                return text;
+                return null;
             }
            
                
@@ -115,7 +113,11 @@ namespace HorryDragonProject.Custom {
             string description = $"## Search tags:```{tag}```\n";
             description += $"## Tags: ```{string.Join(", ", str.Tags.General.Take(25))}```\n\n";
             description += $"[[LINK SOURCE]]({str.File.Url}) | [[Page e621]](https://e621.net/posts/{str.Id})\n";
-            description += $"## Sources:\n{souces}";
+            if (souces != null)
+            {
+                description += $"## Sources:\n{souces}";
+            }
+            
 
             EmbedBuilder postEmbed = new EmbedBuilder()
             {

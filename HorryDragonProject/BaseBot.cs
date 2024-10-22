@@ -33,7 +33,6 @@ namespace HorryDragonProject {
         }
 
 
-
         private static async Task setupDatabaseTask(DatabaseContext context) {
         var migrations = await context.Database.GetPendingMigrationsAsync();
         if (migrations.Any()) {
@@ -46,7 +45,6 @@ namespace HorryDragonProject {
         }
         
 
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var context = _service.GetRequiredService<DatabaseContext>();
@@ -57,7 +55,11 @@ namespace HorryDragonProject {
             _client.Ready += async () => {
                 await Task.CompletedTask;
                 await _sCommand.RegisterCommandsGloballyAsync(true);
-                Console.WriteLine("Starting rawr bot..");
+                Console.WriteLine("   __ __                  ___                          ___       __ ");
+                Console.WriteLine("  / // /__  __________ __/ _ \\_______ ____ ____  ___  / _ )___  / /");
+                Console.WriteLine(" / _  / _ \\/ __/ __/ // / // / __/ _ `/ _ `/ _ \\/ _ \\/ _  / _ \\/ __/");
+                Console.WriteLine("/_//_/\\___/_/ /_/  \\_, /____/_/  \\_,_/\\_, /\\___/_//_/____/\\___/\\__/");
+                Console.WriteLine("                  /___/              /___/                         ");
                 Console.WriteLine($"Ver: {Assembly.GetEntryAssembly()?.GetName().Version} ");
                 await setupDatabaseTask(context);
                 await _watcher.StartWatchig();

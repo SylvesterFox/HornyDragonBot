@@ -28,6 +28,7 @@ namespace HorryDragonProject
 
             var path = DbSettings.LocalPathDB();
 
+
             var builder = new HostApplicationBuilder();
             builder.Services.AddDbContextFactory<DatabaseContext>(
                 options => {

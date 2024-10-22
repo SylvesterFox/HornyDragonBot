@@ -5,7 +5,7 @@
 namespace DragonData.Migrations
 {
     /// <inheritdoc />
-    public partial class WatcherPost : Migration
+    public partial class Data : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,8 @@ namespace DragonData.Migrations
                 columns: table => new
                 {
                     guildID = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    guildName = table.Column<string>(type: "TEXT", nullable: false)
+                    guildName = table.Column<string>(type: "TEXT", nullable: false),
+                    queryCatagoryId = table.Column<ulong>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,7 +59,9 @@ namespace DragonData.Migrations
                 {
                     channelID = table.Column<ulong>(type: "INTEGER", nullable: false),
                     guildID = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    watchTags = table.Column<string>(type: "TEXT", nullable: false)
+                    watchTags = table.Column<string>(type: "TEXT", nullable: false),
+                    pause = table.Column<bool>(type: "INTEGER", nullable: false),
+                    interval = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

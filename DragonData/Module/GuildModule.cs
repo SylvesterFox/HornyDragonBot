@@ -9,7 +9,6 @@ public class GuildModule
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public ulong guildID { get; set; }
     public string guildName { get; set; }
-    public string queryCategoryName { get; set; } = "HorryDragonBot";
     public ulong queryCatagoryId { get; set; } = 0;
 
     public ICollection<GuildBlockListModule> GuildblockLists { get; set; }

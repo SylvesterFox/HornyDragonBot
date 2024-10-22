@@ -58,10 +58,6 @@ namespace DragonData.Migrations
                     b.Property<ulong>("queryCatagoryId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("queryCategoryName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("guildID");
 
                     b.ToTable("Guilds");

@@ -93,12 +93,6 @@ namespace DragonData.Base
             }
         }
 
-        public async Task<string> GetDefaultNameCategory(SocketGuild guild)
-        {
-            GuildModule dataGuild = await GetAndCreateDataGuild(guild);
-            return dataGuild.queryCategoryName;
-        }
-
         public async Task<ulong> GetIdCategoty(SocketGuild guild)
         {
             GuildModule dataGuild = await GetAndCreateDataGuild(guild);

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DragonData.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241020191728_DataWatcherPauseUpdate")]
-    partial class DataWatcherPauseUpdate
+    [Migration("20241022143207_Data")]
+    partial class Data
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,6 +57,9 @@ namespace DragonData.Migrations
                     b.Property<string>("guildName")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<ulong>("queryCatagoryId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("guildID");
 

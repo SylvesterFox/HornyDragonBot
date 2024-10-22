@@ -25,9 +25,11 @@ namespace HorryDragonProject.Module
         public async Task CreateWatcherCmd(string tag)
         {
             await DeferAsync(ephemeral: true);
+            ulong idcategory = await dragonDataBase.dataGuild.GetIdCategoty(Context.Guild);
             SocketCategoryChannel? category = null;
 
             var tagCheck = await api.GetPost(tag, guild: Context.Guild);
+
             if (await blocklist.CheckTagBlocklistForGuild(Context.Guild, tag) == true)
             {
                 var text = await blocklist.GetStringBlocklistForGuild(Context.Guild);
@@ -42,21 +44,12 @@ namespace HorryDragonProject.Module
                 return;
             }
 
-            var idCategory = await dragonDataBase.dataGuild.GetIdCategoty(Context.Guild);
-            if (idCategory != 0)
-            {
-                category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Id == idCategory);
-            } else
-            {
-                var nameCategory = await dragonDataBase.dataGuild.GetDefaultNameCategory(Context.Guild);
-                await Context.Guild.CreateCategoryChannelAsync(nameCategory);
-                category = Context.Guild.CategoryChannels.SingleOrDefault(x => x.Name == nameCategory);
-
-                if (category == null) return;
-                await dragonDataBase.dataGuild.SetIdCategory(category.Id, Context.Guild);
-            }
-
             var channel = await Context.Guild.CreateTextChannelAsync(tag);
+
+            if (idcategory != 0 )
+            {
+                category = Context.Guild.CategoryChannels.FirstOrDefault(c => c.Id == idcategory);
+            }
 
             if (category != null)
             {
@@ -124,6 +117,16 @@ namespace HorryDragonProject.Module
 
             await FollowupAsync(embed: TemplateEmbeds.embedWarning("The minimum you can set is only 2 minutes!", "The interval was not updated!"));
         }
+
+        [SlashCommand("set-category", "Set a category for creating channels in auto-posting")]
+        public async Task SetCatrgoryCmd(SocketCategoryChannel socketCategory)
+        {
+            await DeferAsync(ephemeral: true);
+            await dragonDataBase.dataGuild.SetIdCategory(socketCategory.Id, Context.Guild);
+            await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Set category {socketCategory.Name}", "Update category!"));
+        }
+
+
     }
     
     

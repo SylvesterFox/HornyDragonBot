@@ -151,6 +151,15 @@ namespace HorryDragonProject.Service
             try
             {
                 SocketTextChannel _textChannel = (SocketTextChannel)_client.GetChannel(queryData.channelId);
+
+                if ( _textChannel == null )
+                {
+                    StopWatchig(queryData.channelId);
+                    await dragonDataBase.watchlist.DeleteQueryAsync(queryData.channelId);
+                    _logger.LogWarning("For some reason the channel does not exist, and it was removed from auto-posting");
+                    return;
+                }
+
                 HashSet<int> newPostIds = new HashSet<int>();
                 await api.GetAllResponse(tag, linit: 1, random: false, guild: queryData.guild);
 
