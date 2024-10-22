@@ -3,10 +3,8 @@
     {
         public string TOKEN_BOT { get; set;} = string.Empty;
         public string TOKEN_E621 { get; set; } = string.Empty;
-        public bool DEBUG { get; set; } = false;
         public string USER_E621 { get; set; } = string.Empty;
-        public string LOGS { get; set; } = "info";
-        public int POSTERINTERLAL { get; set; } = 300000;
+
     }
 
 }
