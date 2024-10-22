@@ -1,4 +1,3 @@
-using System;
 using Discord;
 using Discord.Interactions;
 
@@ -19,6 +18,19 @@ namespace HorryDragonProject.Handlers {
 
 
     public class ephemeralView : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            IEnumerable<AutocompleteResult> results = new[] {
+                new AutocompleteResult("True", true),
+                new AutocompleteResult("False", false)
+            };
+
+            return AutocompletionResult.FromSuccess(results);
+        }
+    }
+
+    public class BlockListIgnore : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
         {
