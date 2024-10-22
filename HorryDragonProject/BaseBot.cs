@@ -33,15 +33,16 @@ namespace HorryDragonProject {
         }
 
 
-        private static async Task setupDatabaseTask(DatabaseContext context) {
-        var migrations = await context.Database.GetPendingMigrationsAsync();
-        if (migrations.Any()) {
-            Console.WriteLine("===== Migrations required: " + string.Join(", ", migrations) + " =====");
-            await context.Database.MigrateAsync();
-            await context.SaveChangesAsync();
-        }
+        private async Task setupDatabaseTask(DatabaseContext context) {
+            var migrations = await context.Database.GetPendingMigrationsAsync();
+            if (migrations.Any()) {
+                Console.WriteLine("===== Migrations required: " + string.Join(", ", migrations) + " =====");
+                await context.Database.MigrateAsync();
+                await context.SaveChangesAsync();
+            }
             
-        await context.Database.EnsureCreatedAsync();
+            await context.Database.EnsureCreatedAsync();
+
         }
         
 
@@ -51,9 +52,9 @@ namespace HorryDragonProject {
             var _sCommand = _service.GetRequiredService<InteractionService>();
             var _watcher = _service.GetRequiredService<ServiceWatcherPost>();
             await _service.GetRequiredService<InteractionHandler>().InitInteraction();
+            
              
             _client.Ready += async () => {
-                await Task.CompletedTask;
                 await _sCommand.RegisterCommandsGloballyAsync(true);
                 Console.WriteLine("   __ __                  ___                          ___       __ ");
                 Console.WriteLine("  / // /__  __________ __/ _ \\_______ ____ ____  ___  / _ )___  / /");
@@ -68,6 +69,7 @@ namespace HorryDragonProject {
 
             await _client.LoginAsync(TokenType.Bot, _botConfig.TOKEN_BOT);
             await _client.StartAsync();
+            
 
             await Task.Delay(Timeout.Infinite);
         }

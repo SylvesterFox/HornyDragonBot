@@ -21,6 +21,7 @@ namespace HorryDragonProject.Service
         public readonly ILogger _logger;
         private ConcurrentQueue<QueryData> _queriesQueue;
         private bool _isProcessing;
+        private Timer? _dbCheckTimer;
 
         public E621api api { private get; set; }
         public DragonDataBase dragonDataBase { private get; set; }
@@ -45,15 +46,16 @@ namespace HorryDragonProject.Service
                 StartTimerForQuery(query);
             }
 
+            _dbCheckTimer = new Timer(async _ => await UpdateQueriesFromDatabase(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
-            var dbCheckTimer = new Timer(async _ => await UpdateQueriesFromDatabase(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
-            await Task.Run(ProcessQueue);
+            _ = Task.Run(ProcessQueue);
+            
         }
 
         private async Task UpdateQueriesFromDatabase()
         {
             var dbQueries = await dragonDataBase.watchlist.GetActiveQueriesAsync();
+            _logger.LogInformation("[DB Update] Check for updating database");
 
             foreach(var query in dbQueries)
             {
