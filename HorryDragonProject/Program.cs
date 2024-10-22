@@ -55,7 +55,7 @@ namespace HorryDragonProject
             #if DEBUG
             .SetMinimumLevel(LogLevel.Trace)
             #else            
-            .SetMinmumLevel(LogLevel.Information)
+            .SetMinimumLevel(LogLevel.Information)
             #endif
             );
 
