@@ -30,4 +30,11 @@
     </None>
   </ItemGroup>
 
+<ItemGroup>
+	<Content Update="DragonData.dll">
+		<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	</Content>
+</ItemGroup>
+
 </Project>
