@@ -3,7 +3,7 @@ This discord bot was created on .NET 8 to track the necessary tags from e621 and
 In the future there will be a tracking update of the user gallery in furaffinity
 
 ## How to deploy a bot on Linux
-###First you need to install dotnet-runtime
+### First you need to install dotnet-runtime
 1. Download the dotnet installation script
 ```bash
 wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
