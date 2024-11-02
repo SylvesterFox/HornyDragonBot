@@ -4,7 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
-namespace HorryDragonProject.Handlers {
+namespace HornyDragonBot.Handlers {
     public class InteractionHandler
     {
         private readonly DiscordSocketClient _client;

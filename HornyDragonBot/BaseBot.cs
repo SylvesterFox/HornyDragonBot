@@ -3,15 +3,16 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DragonData.Context;
-using HorryDragonProject.Handlers;
-using HorryDragonProject.Service;
-using HorryDragonProject.Settings;
+using HornyDragonBot.Service;
+using HornyDragonBot.Handlers;
+using HornyDragonBot.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace HorryDragonProject {
-     
+namespace HorryDragonProject
+{
+
     internal class BaseBot : BackgroundService
     {
 

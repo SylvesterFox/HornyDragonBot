@@ -1,7 +1,6 @@
-using System;
 using System.Text.Json.Serialization;
 
-namespace HorryDragonProject.api.e621 {
+namespace HornyDragonBot.api.e621 {
     public class E621Post
     {
         [JsonPropertyName("posts")]

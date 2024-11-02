@@ -1,11 +1,12 @@
 using Discord.WebSocket;
-using HorryDragonProject.Settings;
+using HornyDragonBot.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using System.Text.Json;
 
-namespace HorryDragonProject.api.e621{
+namespace HornyDragonBot.api.e621
+{
     public class E621api
     {
 
@@ -15,7 +16,7 @@ namespace HorryDragonProject.api.e621{
         private string _token;
         private readonly BotConfig? _botConfig;
         private int _limit { get; set; } = 1;
-        
+
         private string _requrstPage { get; set; } = "1";
         public string reating { get; set; } = "e";
         private string types { get; set; } = string.Empty;
@@ -45,15 +46,19 @@ namespace HorryDragonProject.api.e621{
                 if (random)
                 {
                     tag += $" {types} rating:{reating} order:random";
-                } else
+                }
+                else
                 {
                     tag += $" {types} rating:{reating}";
                 }
 
-                if (socketUser != null && blocklistUser != null) {
+                if (socketUser != null && blocklistUser != null)
+                {
                     tag += blocklistUser[socketUser.Id];
                     _logger.LogDebug($"Blocklist {blocklistUser[socketUser.Id]}");
-                } else if (socketGuild != null && blocklistGuild != null) {
+                }
+                else if (socketGuild != null && blocklistGuild != null)
+                {
                     tag += blocklistGuild[socketGuild.Id];
                     _logger.LogDebug($"Blocklist {blocklistGuild[socketGuild.Id]}");
                 }
@@ -71,7 +76,8 @@ namespace HorryDragonProject.api.e621{
                 {
                     _logger.LogTrace("[Error] " + response.Content);
                     return string.Empty;
-                } else
+                }
+                else
                 {
                     _logger.LogDebug($"{response.ResponseStatus} Code: {response.StatusCode}");
                     return response.Content;
@@ -79,12 +85,13 @@ namespace HorryDragonProject.api.e621{
             }
             catch (Exception ex)
             {
-                _logger.LogTrace("[Error] " +  ex.Message);
+                _logger.LogTrace("[Error] " + ex.Message);
                 throw new HttpRequestException(HttpRequestError.ConnectionError);
             }
         }
 
-        public async Task<Post?> GetPost(string tags, SocketUser? user = null, SocketGuild? guild = null) {
+        public async Task<Post?> GetPost(string tags, SocketUser? user = null, SocketGuild? guild = null)
+        {
 
             var _response = await _RequsetApi(_address, tags, false, false, user, guild);
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
@@ -111,12 +118,15 @@ namespace HorryDragonProject.api.e621{
         {
             _limit = linit;
 
-            if (type != "type:webm") {
+            if (type != "type:webm")
+            {
                 types = type + " -type:webm -type:swf";
-            } else {
+            }
+            else
+            {
                 types = type;
             }
-            
+
             if (_limit > 320)
             {
                 _limit = 320;
@@ -126,11 +136,11 @@ namespace HorryDragonProject.api.e621{
 
             var deserializedResponse = JsonSerializer.Deserialize<E621Post>(_response);
 
-            if(deserializedResponse != null)
+            if (deserializedResponse != null)
             {
                 Response = deserializedResponse.Posts;
             }
-            
+
         }
 
 

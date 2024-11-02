@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.Interactions;
 using DragonData;
-using HorryDragonProject.api.e621;
-using HorryDragonProject.Custom;
-using HorryDragonProject.Handlers;
-using HorryDragonProject.Service;
+using HornyDragonBot.api.e621;
+using HornyDragonBot.Custom;
+using HornyDragonBot.Handlers;
+using HornyDragonBot.Service;
 using Microsoft.Extensions.Logging;
 
-namespace HorryDragonProject.Module;
+namespace HornyDragonBot.Module;
 
 [Group("e621", "e621 commands")]
 public class E621Module : BaseModule

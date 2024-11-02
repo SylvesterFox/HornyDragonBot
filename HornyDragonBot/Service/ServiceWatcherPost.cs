@@ -2,14 +2,14 @@
 using Discord.WebSocket;
 using DragonData;
 using DragonData.Module;
-using HorryDragonProject.api.e621;
-using HorryDragonProject.Custom;
+using HornyDragonBot.api.e621;
+using HornyDragonBot.Custom;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 
-namespace HorryDragonProject.Service
+namespace HornyDragonBot.Service
 {
 
     public class ServiceWatcherPost
@@ -49,7 +49,7 @@ namespace HorryDragonProject.Service
             _dbCheckTimer = new Timer(async _ => await UpdateQueriesFromDatabase(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
             _ = Task.Run(ProcessQueue);
-            
+
         }
 
         private async Task UpdateQueriesFromDatabase()
@@ -57,7 +57,7 @@ namespace HorryDragonProject.Service
             var dbQueries = await dragonDataBase.watchlist.GetActiveQueriesAsync();
             _logger.LogInformation("[DB Update] Check for updating database");
 
-            foreach(var query in dbQueries)
+            foreach (var query in dbQueries)
             {
                 if (_timers.ContainsKey(query.channelID))
                 {
@@ -73,7 +73,8 @@ namespace HorryDragonProject.Service
                         StartTimerForQuery(query);
                     }
 
-                } else
+                }
+                else
                 {
                     _logger.LogInformation($"[DB Update] Adding new query with ID {query.channelID}");
                     StartTimerForQuery(query);
@@ -109,7 +110,7 @@ namespace HorryDragonProject.Service
                 {
                     QueueQuery(queryData);
                 }, null, TimeSpan.Zero, queryData.Interval);
-                _timers[query.channelID] = new TimerInfo { Timer = timer, Interval = query.interval};
+                _timers[query.channelID] = new TimerInfo { Timer = timer, Interval = query.interval };
             }
         }
 
@@ -124,7 +125,8 @@ namespace HorryDragonProject.Service
                     await CheckForNewPost(queryData);
 
                     await Task.Delay(2000);
-                } else
+                }
+                else
                 {
                     await Task.Delay(500);
                 }
@@ -136,8 +138,9 @@ namespace HorryDragonProject.Service
             _queriesQueue.Enqueue(queryData);
         }
 
-        private void StopWatchig(ulong channelId) {
-            
+        private void StopWatchig(ulong channelId)
+        {
+
             if (_timers.ContainsKey(channelId))
             {
                 _timers[channelId].Timer.Change(Timeout.Infinite, 0);
@@ -154,7 +157,7 @@ namespace HorryDragonProject.Service
             {
                 SocketTextChannel _textChannel = (SocketTextChannel)_client.GetChannel(queryData.channelId);
 
-                if ( _textChannel == null )
+                if (_textChannel == null)
                 {
                     StopWatchig(queryData.channelId);
                     await dragonDataBase.watchlist.DeleteQueryAsync(queryData.channelId);
@@ -187,7 +190,7 @@ namespace HorryDragonProject.Service
             {
                 _logger.LogCritical(ex.Message);
             }
-            
+
         }
 
         private class QueryData

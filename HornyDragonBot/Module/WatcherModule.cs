@@ -3,12 +3,12 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DragonData;
-using HorryDragonProject.api.e621;
-using HorryDragonProject.Custom;
-using HorryDragonProject.Service;
+using HornyDragonBot.api.e621;
+using HornyDragonBot.Custom;
+using HornyDragonBot.Service;
 using Microsoft.Extensions.Logging;
 
-namespace HorryDragonProject.Module
+namespace HornyDragonBot.Module
 {
     [Group("e621watcher", "E621 Watcher cmd")]
     public class WatcherModule : BaseModule
@@ -46,7 +46,7 @@ namespace HorryDragonProject.Module
 
             var channel = await Context.Guild.CreateTextChannelAsync(tag);
 
-            if (idcategory != 0 )
+            if (idcategory != 0)
             {
                 category = Context.Guild.CategoryChannels.FirstOrDefault(c => c.Id == idcategory);
             }
@@ -64,7 +64,7 @@ namespace HorryDragonProject.Module
                 await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Autoposting is create: <#{socketchannel.Id}>", "Success!"));
             }
 
-            
+
         }
 
 
@@ -94,7 +94,8 @@ namespace HorryDragonProject.Module
             var channelContext = Context.Guild.GetChannel(channel.Id);
             var IsDel = await dragonDataBase.watchlist.DeleteQueryAsync(channel.Id);
 
-            if (IsDel) {
+            if (IsDel)
+            {
                 await channelContext.DeleteAsync();
                 await FollowupAsync(embed: TemplateEmbeds.embedSuccess($"Was successfully deleted: #{channelContext.Name}", "Sussess!"));
                 return;
@@ -128,6 +129,6 @@ namespace HorryDragonProject.Module
 
 
     }
-    
-    
+
+
 }

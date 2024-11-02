@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 
-namespace HorryDragonProject.Module
+namespace HornyDragonBot.Module
 {
     public abstract class BaseModule : InteractionModuleBase<SocketInteractionContext>
     {

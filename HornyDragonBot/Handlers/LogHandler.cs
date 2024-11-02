@@ -1,7 +1,7 @@
 using Discord;
 using Discord.WebSocket;
 
-namespace HorryDragonProject.Handlers {
+namespace HornyDragonBot.Handlers {
     public class LogHandler {
         public LogHandler(DiscordSocketClient client) {
             client.Log += LogAsync;

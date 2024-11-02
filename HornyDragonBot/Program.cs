@@ -1,8 +1,7 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
-using HorryDragonProject.Handlers;
-using HorryDragonProject.api.e621;
-using HorryDragonProject.Service;
+using HornyDragonBot.Handlers;
+using HornyDragonBot.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,8 @@ using DragonData.Context;
 using Microsoft.EntityFrameworkCore;
 using DragonData;
 using DragonData.Base;
+using HornyDragonBot.api.e621;
+using HornyDragonBot.Settings;
 
 
 namespace HorryDragonProject
@@ -19,7 +20,7 @@ namespace HorryDragonProject
         
         static void Main(string[] args) {
 
-            if (!Settings.BotSettingInit.Instance.LoadConfiguration())
+            if (!BotSettingInit.Instance.LoadConfiguration())
             {
                 Console.WriteLine("Configuration is not loaded\nPress any key to exit...");
                 Console.ReadKey();

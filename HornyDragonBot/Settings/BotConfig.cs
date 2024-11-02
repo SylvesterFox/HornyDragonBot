@@ -1,4 +1,4 @@
-﻿namespace HorryDragonProject.Settings {
+﻿namespace HornyDragonBot.Settings {
     public class BotConfig
     {
         public string TOKEN_BOT { get; set;} = string.Empty;

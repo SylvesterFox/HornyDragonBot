@@ -1,12 +1,12 @@
 ﻿using Discord.WebSocket;
 using DragonData;
-using DragonData.Module;
 
-namespace HorryDragonProject.api.e621
+
+namespace HornyDragonBot.api.e621
 {
     public class E621blocklist
     {
-        private DragonDataBase _dragonDataBase {  get; set; }
+        private DragonDataBase _dragonDataBase { get; set; }
         private Dictionary<ulong, string> _blockTagUser = new Dictionary<ulong, string>();
         private Dictionary<ulong, string> _blockTagGuild = new Dictionary<ulong, string>();
 
@@ -22,7 +22,7 @@ namespace HorryDragonProject.api.e621
                 return null;
             }
 
-   /*         UserModule userItem = await _dragonDataBase.dataUser.GetAndCreateDataUser(user);*/
+            /*         UserModule userItem = await _dragonDataBase.dataUser.GetAndCreateDataUser(user);*/
             if (ignore != true)
             {
                 var list = await _dragonDataBase.blocklist.GetBlocklist(user);
@@ -68,7 +68,7 @@ namespace HorryDragonProject.api.e621
                 return _blockTagGuild;
             }
 
-           return null;
+            return null;
         }
 
         public async Task<bool> CheckTagBlocklistForGuild(SocketGuild guild, string tag)
@@ -94,7 +94,7 @@ namespace HorryDragonProject.api.e621
             {
                 blocklist.Add(item.blockTag);
             }
-            
+
             string[] tagArray = tag.Split(' ');
             List<string> queryList = new List<string>(tagArray);
 

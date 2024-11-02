@@ -1,8 +1,8 @@
 using Discord;
-using HorryDragonProject.api.e621;
-using HorryDragonProject.Service;
+using HornyDragonBot.api.e621;
+using HornyDragonBot.Service;
 
-namespace HorryDragonProject.Custom {
+namespace HornyDragonBot.Custom {
 
     public static class TemplateMessage {
         public static string SendVideoTemplate(Post post, string tag)

@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 
-namespace HorryDragonProject.Module {
+namespace HornyDragonBot.Module {
     public class PingModule : BaseModule
     {
         public PingModule(ILoggerFactory log) : base(log)

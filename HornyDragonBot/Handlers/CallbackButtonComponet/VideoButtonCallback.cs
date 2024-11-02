@@ -1,8 +1,8 @@
 using Discord.WebSocket;
-using HorryDragonProject.Custom;
-using HorryDragonProject.Service;
+using HornyDragonBot.Custom;
+using HornyDragonBot.Service;
 
-namespace HorryDragonProject.Handlers.CallbackButtonComponet {
+namespace HornyDragonBot.Handlers.CallbackButtonComponet {
 
     public static class VideoButtonCallback
     {

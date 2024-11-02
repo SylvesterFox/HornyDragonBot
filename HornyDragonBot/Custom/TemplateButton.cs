@@ -1,6 +1,6 @@
 using Discord;
 
-namespace HorryDragonProject.Custom {
+namespace HornyDragonBot.Custom {
     public enum DisplayStyle {
         Full,
         Minimal,

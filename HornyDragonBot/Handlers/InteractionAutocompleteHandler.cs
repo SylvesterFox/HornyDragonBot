@@ -1,7 +1,7 @@
 using Discord;
 using Discord.Interactions;
 
-namespace HorryDragonProject.Handlers {
+namespace HornyDragonBot.Handlers {
     public class E621typeAutocomplete : AutocompleteHandler {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
         {

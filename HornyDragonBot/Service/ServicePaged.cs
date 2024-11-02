@@ -1,11 +1,11 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using HorryDragonProject.Custom;
-using HorryDragonProject.Handlers.CallbackButtonComponet;
+using HornyDragonBot.Custom;
+using HornyDragonBot.Handlers.CallbackButtonComponet;
 
 
-namespace HorryDragonProject.Service
+namespace HornyDragonBot.Service
 {
 
     public enum StopAction {

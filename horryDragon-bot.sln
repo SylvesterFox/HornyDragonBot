@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HorryDragonProject", "HorryDragonProject\HorryDragonProject.csproj", "{FBDACF92-52F4-46F3-BB04-94E94177B3A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HornyDragonBot", "HorryDragonProject\HornyDragonBot.csproj", "{FBDACF92-52F4-46F3-BB04-94E94177B3A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonData", "DragonData\DragonData.csproj", "{B9D1F9DD-A21B-4360-AD83-E09345F5BE2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DragonData", "DragonData\DragonData.csproj", "{B9D1F9DD-A21B-4360-AD83-E09345F5BE2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

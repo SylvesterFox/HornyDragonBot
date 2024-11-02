@@ -1,4 +1,4 @@
-﻿namespace HorryDragonProject.Settings {
+﻿namespace HornyDragonBot.Settings {
     public static class EnvSerializer {
         public static BotConfig Deserialize(string filepath) {
             var envVariables = new BotConfig();
