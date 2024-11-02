@@ -1,8 +1,8 @@
-using DragonData.Base;
-using DragonData.Context;
+using HornyDragonBot.Data.Base;
+using HornyDragonBot.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace DragonData;
+namespace HornyDragonBot.Data;
 
 public class DragonDataBase
 {

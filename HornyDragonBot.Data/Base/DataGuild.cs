@@ -1,9 +1,9 @@
 ﻿using Discord.WebSocket;
-using DragonData.Context;
-using DragonData.Module;
+using HornyDragonBot.Data.Context;
+using HornyDragonBot.Data.Module;
 using Microsoft.EntityFrameworkCore;
 
-namespace DragonData.Base
+namespace HornyDragonBot.Data.Base
 {
     public class DataGuild : DataBase
     {

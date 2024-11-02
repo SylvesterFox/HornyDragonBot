@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace DragonData.Settings
+namespace HornyDragonBot.Data.Settings
 {
     public class DefaultList
     {

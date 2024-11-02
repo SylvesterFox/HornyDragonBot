@@ -1,7 +1,7 @@
 ﻿
 using Discord.WebSocket;
-using DragonData;
-using DragonData.Module;
+using HornyDragonBot.Data;
+using HornyDragonBot.Data.Module;
 using HornyDragonBot.api.e621;
 using HornyDragonBot.Custom;
 using Microsoft.Extensions.DependencyInjection;

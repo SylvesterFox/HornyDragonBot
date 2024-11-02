@@ -1,6 +1,4 @@
-using System;
-
-namespace DragonData.Context;
+namespace HornyDragonBot.Data.Context;
 
 public static class DbSettings
 {

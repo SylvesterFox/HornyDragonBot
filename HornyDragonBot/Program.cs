@@ -5,10 +5,10 @@ using HornyDragonBot.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using DragonData.Context;
+using HornyDragonBot.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using DragonData;
-using DragonData.Base;
+using HornyDragonBot.Data;
+using HornyDragonBot.Data.Base;
 using HornyDragonBot.api.e621;
 using HornyDragonBot.Settings;
 

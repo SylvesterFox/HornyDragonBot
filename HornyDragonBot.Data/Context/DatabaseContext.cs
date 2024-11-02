@@ -1,7 +1,7 @@
-using DragonData.Module;
+using HornyDragonBot.Data.Module;
 using Microsoft.EntityFrameworkCore;
 
-namespace DragonData.Context;
+namespace HornyDragonBot.Data.Context;
 
 public class DatabaseContext : DbContext
 {

@@ -1,12 +1,12 @@
 
 using Discord.WebSocket;
-using DragonData.Context;
-using DragonData.Module;
-using DragonData.Settings;
+using HornyDragonBot.Data.Context;
+using HornyDragonBot.Data.Module;
+using HornyDragonBot.Data.Settings;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace DragonData.Base;
+namespace HornyDragonBot.Data.Base;
 
 public class DataBlocklist : DataBase
 {

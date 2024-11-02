@@ -2,7 +2,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using DragonData;
+using HornyDragonBot.Data;
 using HornyDragonBot.api.e621;
 using HornyDragonBot.Custom;
 using HornyDragonBot.Service;

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace DragonData.Context;
+namespace HornyDragonBot.Data.Context;
 
 public class ContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
 {

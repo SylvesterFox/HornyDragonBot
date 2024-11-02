@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using DragonData;
+using HornyDragonBot.Data;
 
 
 namespace HornyDragonBot.api.e621

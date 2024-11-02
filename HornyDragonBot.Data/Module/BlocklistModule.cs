@@ -2,13 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DragonData.Module;
+namespace HornyDragonBot.Data.Module;
 
-public class UserModule
+public class BlocklistModule
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public ulong userID { get; set; }
-    public string username { get; set; }
-    public ICollection<BlocklistModule> Blocklists { get; set; }
+    public UserModule User { get; set; }
+    public string blockTag { get; set; }
+
 }

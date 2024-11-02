@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace DragonData.Migrations
+namespace HornyDragonBot.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Data : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

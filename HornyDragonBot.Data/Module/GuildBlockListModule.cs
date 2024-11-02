@@ -1,6 +1,6 @@
 
 
-namespace DragonData.Module;
+namespace HornyDragonBot.Data.Module;
 
 public class GuildBlockListModule
 {
