@@ -15,10 +15,10 @@ using HornyDragonBot.Settings;
 
 namespace HorryDragonProject
 {
-    internal class Program()
+    public class Program()
     {
         
-        static void Main(string[] args) {
+        static async Task Main(string[] args) {
 
             if (!BotSettingInit.Instance.LoadConfiguration())
             {
@@ -31,6 +31,8 @@ namespace HorryDragonProject
 
 
             var builder = new HostApplicationBuilder();
+
+
             builder.Services.AddDbContextFactory<DatabaseContext>(
                 options => {
                     options.UseSqlite($"Data Source={path}");
@@ -63,7 +65,9 @@ namespace HorryDragonProject
             
 
             var host = builder.Build();
-            host.Run();
+
+            await host.RunAsync();
+            
        }
     }
 }

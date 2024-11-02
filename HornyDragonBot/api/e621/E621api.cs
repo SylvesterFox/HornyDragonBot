@@ -39,7 +39,7 @@ namespace HornyDragonBot.api.e621
             try
             {
 
-                var requrst = new RestRequest(uri, Method.Get);
+                var request = new RestRequest(uri, Method.Get);
                 var blocklistUser = await _blocklist.UseBlocklistUser(user: socketUser, ignore: ignoreBlocklist);
                 var blocklistGuild = await _blocklist.UseBlocklistGuild(guild: socketGuild, ignore: ignoreBlocklist);
 
@@ -63,15 +63,15 @@ namespace HornyDragonBot.api.e621
                     _logger.LogDebug($"Blocklist {blocklistGuild[socketGuild.Id]}");
                 }
 
-                requrst.AddParameter("tags", tag);
-                requrst.AddParameter("limit", _limit);
-                requrst.AddParameter("page", _requrstPage);
+                request.AddParameter("tags", tag);
+                request.AddParameter("limit", _limit);
+                request.AddParameter("page", _requrstPage);
 
-                requrst.AddHeader("User-Agent", "HorryDragonProject/1.0 (by Dragofox)");
-                requrst.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
+                request.AddHeader("User-Agent", "HorryDragonProject/1.0 (by Dragofox)");
+                request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(_user + ":" + _token)));
 
                 var restApi = new RestClient();
-                var response = await restApi.ExecuteAsync(requrst);
+                var response = await restApi.ExecuteAsync(request);
                 if ((int)response.StatusCode != 200)
                 {
                     _logger.LogTrace("[Error] " + response.Content);

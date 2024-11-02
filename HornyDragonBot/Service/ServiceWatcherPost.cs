@@ -1,5 +1,4 @@
-﻿
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using HornyDragonBot.Data;
 using HornyDragonBot.Data.Module;
 using HornyDragonBot.api.e621;

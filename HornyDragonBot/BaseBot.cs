@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+
 namespace HorryDragonProject
 {
 
@@ -66,13 +67,22 @@ namespace HorryDragonProject
                 await setupDatabaseTask(context);
                 await _watcher.StartWatchig();
             };
- 
+
+
+           
 
             await _client.LoginAsync(TokenType.Bot, _botConfig.TOKEN_BOT);
             await _client.StartAsync();
-            
 
-            await Task.Delay(Timeout.Infinite);
+            Console.CancelKeyPress += async (sender, e) =>
+            {
+                await _client.LogoutAsync();
+                await _client.StopAsync();
+                
+            };
+
+
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
     }
 }
