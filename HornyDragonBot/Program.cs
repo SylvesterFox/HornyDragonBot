@@ -11,6 +11,7 @@ using HornyDragonBot.Data;
 using HornyDragonBot.Data.Base;
 using HornyDragonBot.api.e621;
 using HornyDragonBot.Settings;
+using HornyDragonBot.api.furaffinity;
 
 
 namespace HorryDragonProject
@@ -44,6 +45,7 @@ namespace HorryDragonProject
             builder.Services.AddSingleton<DataUser>();
             builder.Services.AddSingleton<DataGuild>();
 
+            builder.Services.AddSingleton<FuraffinityApi>();
 
             builder.Services.AddSingleton<LogHandler>();
             builder.Services.AddSingleton<E621api>();

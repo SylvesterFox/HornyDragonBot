@@ -21,7 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HornyDragonBot.Data\HornyDragonBot.Data.csproj" />
-	
+	<ProjectReference Include="..\HornyDragonBot.Api\HornyDragonBot.Api.csproj" />
   </ItemGroup>
 
 
