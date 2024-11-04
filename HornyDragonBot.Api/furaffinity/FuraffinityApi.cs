@@ -15,12 +15,14 @@ namespace HornyDragonBot.api.furaffinity
             _logger = logger;
         }
 
-        private async Task<string> RequsetApi(string uri)
+        private async Task<string> RequsetApi(string uri, int page = 1)
         {
             try
             {
                 var request = new RestRequest(uri, Method.Get);
                 request.AddHeader("User-Agent", "HorryDragonProject/1.0 (by Dragofox)");
+
+                request.AddParameter("page", page);
 
                 var clientApi = new RestClient();
                 var response = await clientApi.ExecuteAsync(request);
@@ -40,26 +42,46 @@ namespace HornyDragonBot.api.furaffinity
 
         }
 
-        private async Task<List<string>?> GetUserGallery(string username)
+        private async Task<Dictionary<int, List<string>>?> GetUserGallery(string username)
         {
-            try
-            {
-                string requsetPath = ApiUrl + $"/user/{username}/gallery.json";
-                string content = await RequsetApi(requsetPath);
 
-                var deserializedResponse = JsonSerializer.Deserialize<List<string>>(content);
+            Dictionary<int, List<string>> dataPage = new Dictionary<int, List<string>>();
 
-                if (deserializedResponse == null)
+            int pageMax = 5;
+            List<Task<(int Page, List<string> Ids)>> tasks = new List<Task<(int, List<string>)>>();
+
+
+            for (int page = 1; page <= pageMax; page++) {
+                int currentPage = page;
+                tasks.Add(Task.Run(async () =>
                 {
-                    return null;
-                }
+                    try
+                    {
+                        string requsetPath = ApiUrl + $"/user/{username}/gallery.json";
+                        string content = await RequsetApi(requsetPath, currentPage);
 
-                return deserializedResponse;
+                        List<string>? idsResponse = JsonSerializer.Deserialize<List<string>>(content);
+
+                        return (currentPage, idsResponse ?? new List<string>());
+                    }
+                    catch 
+                    {
+                        return (currentPage, new List<string>());
+                    }
+
+                }));
             }
-            catch (Exception ex) {
-                _logger.LogError(ex.Message);
-                return null;
+
+            var results = await Task.WhenAll(tasks);
+
+            foreach (var result in results) {
+                if (result.Ids.Count > 0) {
+                    dataPage[result.Page] = result.Ids;
+                }
             }
+
+
+            return dataPage;
         }
 
         private async Task<submission?> GetSubmission(string id)
@@ -76,7 +98,6 @@ namespace HornyDragonBot.api.furaffinity
                 }
 
                 return deserializedResponse;
-
             }
             catch (Exception ex) { 
                 _logger.LogError(ex.Message);
@@ -91,9 +112,19 @@ namespace HornyDragonBot.api.furaffinity
             var idPost = await GetUserGallery(username);
             if (idPost != null) {
                 var rnd = new Random();
-                int r = rnd.Next(idPost.Count);
+                int rPage = rnd.Next(1, idPost.Count);
+                var pageGet = idPost.FirstOrDefault(x => x.Key == rPage);
+                int countPage = pageGet.Value.Count;
+                int rPost = rnd.Next(countPage);
 
-                var post = await GetSubmission(idPost[r]);
+                var post = await GetSubmission(pageGet.Value[rPost]);
+
+                if (post == null)
+                {
+                    return string.Empty;
+                }
+
+                _logger.LogInformation($"Get random post from page: {rPage} post: {post.download}");
                 return post.full;
             }
             
