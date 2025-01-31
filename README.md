@@ -16,7 +16,7 @@ sudo chmod +x ./dotnet-install.sh
 
 3. Install dotnet-runtime 
 ```bash
-./dotnet-install.sh --version latest –runtime dotnet
+./dotnet-install.sh --version latest --runtime dotnet
 ```
 
 4. After installing dotnet runtime, we need to add environment variables, here it is written in detail how to do this
