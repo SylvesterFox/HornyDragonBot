@@ -11,12 +11,12 @@ wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
 
 2. We make the script executable and give it these rights
 ```bash
-wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+sudo chmod +x ./dotnet-install.sh
 ```
 
 3. Install dotnet-runtime 
 ```bash
-/dotnet-install.sh --version latest –runtime dotnet
+./dotnet-install.sh --version latest –runtime dotnet
 ```
 
 4. After installing dotnet runtime, we need to add environment variables, here it is written in detail how to do this
