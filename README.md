@@ -30,7 +30,7 @@ wget https://github.com/SylvesterFox/HornyDragonBot/releases/download/0.0.1.5-al
 
 2. Let's unzip the archive
 ```bash
-tar –xfv hornyDragonProject.tar
+tar -xfv hornyDragonProject.tar
 ```
 
 3. Go to the `hornybot` directory and create a `.env` file to configure the bot
