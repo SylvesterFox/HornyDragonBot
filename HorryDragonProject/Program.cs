@@ -10,6 +10,7 @@ using DragonData.Context;
 using Microsoft.EntityFrameworkCore;
 using DragonData;
 using DragonData.Base;
+using DragonData.Settings;
 
 
 namespace HorryDragonProject
@@ -19,14 +20,14 @@ namespace HorryDragonProject
         
         static void Main(string[] args) {
 
-            if (!Settings.BotSettingInit.Instance.LoadConfiguration())
+            if (!BotSettings.BotSettingInit.Instance.LoadConfiguration())
             {
                 Console.WriteLine("Configuration is not loaded\nPress any key to exit...");
                 Console.ReadKey();
                 return;
             }
 
-            var path = DbSettings.LocalPathDB();
+            var path = SettingsDefault.LocalPathDB();
 
 
             var builder = new HostApplicationBuilder();

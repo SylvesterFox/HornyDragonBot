@@ -1,5 +1,6 @@
+using BotSettings;
 using Discord.WebSocket;
-using HorryDragonProject.Settings;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RestSharp;

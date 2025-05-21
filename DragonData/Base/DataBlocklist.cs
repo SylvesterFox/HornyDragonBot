@@ -10,7 +10,7 @@ namespace DragonData.Base;
 
 public class DataBlocklist : DataBase
 {
-    public static List<string> _globalBlockList = SettingsBlocklistDefault.GetJsonBlocklist();
+    public static List<string> _globalBlockList = SettingsDefault.GetJsonBlocklist();
 
     public DataBlocklist(IDbContextFactory<DatabaseContext> context) : base(context)
     {

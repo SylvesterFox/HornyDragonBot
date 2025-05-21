@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿
+using BotSettings;
+using System.Text.Json;
+
 
 namespace DragonData.Settings
 {
@@ -7,15 +10,22 @@ namespace DragonData.Settings
         public List<string> Blocklist { get; set; }
     }
 
-    public static class SettingsBlocklistDefault
+    public static class SettingsDefault
     {
         private static DefaultList _defaultList = new DefaultList { 
             Blocklist = new List<string>() { "gore", "scat", "watersports", "loli", "shota", "my_little_pony", "young", "fart", "intersex", "humanoid" } 
         };
 
+        private static BotConfig _botConfig = BotSettingInit.Instance.LoadedConfig;
+
+
         private static string folder = "HorryDragon";
         private static string file = "blocklistDefault.json";
-        private static string folderComine = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), folder);
+        private static string fileDB = "HorryDragon.db";
+        private static string defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        private static string folderComine = Path.Combine(_botConfig.DB_PATH ?? defaultPath, folder);
+
+
 
         public static string InitBlocklist()
         {
@@ -47,6 +57,20 @@ namespace DragonData.Settings
             }
 
             throw new JsonException("Json file not found");
+        }
+
+        public static string LocalPathDB()
+        {
+            //string folderComine = Path.Combine(Environment.GetFolderPath(
+            //                Environment.SpecialFolder.LocalApplicationData),
+            //                folder);
+            bool folderExists = Directory.Exists(folderComine);
+            if (!folderExists)
+            {
+                Directory.CreateDirectory(folderComine);
+            }
+            var pathDb = Path.Join(folderComine, fileDB);
+            return pathDb;
         }
 
 

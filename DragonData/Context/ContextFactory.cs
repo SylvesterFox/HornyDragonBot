@@ -1,3 +1,4 @@
+using DragonData.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -7,7 +8,7 @@ public class ContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
 {
     public DatabaseContext CreateDbContext(string[] args)
     {
-        var path = DbSettings.LocalPathDB();
+        var path = SettingsDefault.LocalPathDB();
 
         var optionsBuild = new DbContextOptionsBuilder()
             .UseSqlite($"Data Source={path}");

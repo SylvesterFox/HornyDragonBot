@@ -20,14 +20,8 @@
     <PackageReference Include="RestSharp" Version="112.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BotSettings\BotSettings.csproj" />
     <ProjectReference Include="..\DragonData\DragonData.csproj" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <None Update=".env">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 <ItemGroup>
@@ -35,6 +29,10 @@
 		<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	</Content>
+</ItemGroup>
+
+<ItemGroup>
+  <Folder Include="Settings\" />
 </ItemGroup>
 
 </Project>
