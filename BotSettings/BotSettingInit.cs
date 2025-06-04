@@ -1,4 +1,5 @@
-﻿namespace HorryDragonProject.Settings {
+﻿namespace BotSettings
+{
     public class BotSettingInit {
         public BotConfig LoadedConfig = new BotConfig();
 

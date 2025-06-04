@@ -154,8 +154,8 @@ public class VideoResolution
     [JsonPropertyName("width")]
     public int? Width { get; set; }
 
-    [JsonPropertyName("urls")]
-    public required List<string>? Urls { get; set; }
+    [JsonPropertyName("url")]
+    public required String Url { get; set; }
 }
 
 public class Score

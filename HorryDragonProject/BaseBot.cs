@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
+using BotSettings;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using DragonData.Context;
 using HorryDragonProject.Handlers;
 using HorryDragonProject.Service;
-using HorryDragonProject.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
